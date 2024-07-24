@@ -49,7 +49,7 @@ functionStmt
 
 templateDeclaration
     : 'template' ID '(' args* ')' statement*
-//    | 'template' 'custom' ID '(' args* ')' statement*
+    | 'template' 'custom' ID '(' args* ')' statement*
     ;
 
 componentMainDeclaration
