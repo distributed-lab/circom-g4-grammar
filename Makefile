@@ -11,6 +11,7 @@ all: clean $(OUTPUT_DIR) $(OUTPUT_DIR)/grammar
 	$(ANTLR4_GO) -o $(OUTPUT_DIR) $(GRAMMAR_FILE)
 	cp -r $(OUTPUT_DIR)/grammar/* $(OUTPUT_DIR)
 	rm -rf $(OUTPUT_DIR)/grammar
+	javac $(OUTPUT_DIR)/*.java
 
 $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
