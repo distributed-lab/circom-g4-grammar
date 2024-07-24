@@ -65,6 +65,10 @@ statement
     | expression (assignment | constraintEq) expression
     | primary (leftAssignment | assigmentOp) expression
     | expression rightAssignment primary
+    | '_' (assignment | leftAssignment) (expression | (blockInstantiation componentCall?))
+    | (expression | (blockInstantiation componentCall?)) rightAssignment '_'
+    | '(' argsWithUnderscore ')' (assignment | leftAssignment) (blockInstantiation componentCall?)
+    | (blockInstantiation componentCall?) rightAssignment '(' argsWithUnderscore ')'
     | 'if' parExpression statement ('else' statement)?
     | 'while' parExpression statement
     | 'for' '(' forControl ')' statement
@@ -72,9 +76,9 @@ statement
     ;
 
 componentCall
-    : ('(' expression (',' expression)* ')')?
-    | ('(' ID leftAssignment expression (',' ID leftAssignment expression)* ')')
-    | ('(' expression rightAssignment ID (',' expression rightAssignment ID)* ')')
+    : '(' expression (',' expression)* ')'
+    | '(' ID leftAssignment expression (',' ID leftAssignment expression)* ')'
+    | '(' expression rightAssignment ID (',' expression rightAssignment ID)* ')'
     ;
 
 forControl: forInit ';' expression ';' forUpdate ;
@@ -90,7 +94,7 @@ expression
     | expression '.' ID
     | expression '?' expression ':' expression
     | blockInstantiation
-    | ('~' | '!') expression
+    | ('~' | '!' | '-') expression
     | expression '**' expression
     | expression ('*' | '/' | '\\' | '%') expression
     | expression ('+' | '-') expression
@@ -112,7 +116,7 @@ componentDeclaration
     : componentDefinition arrayDimension* (assignment blockInstantiation)?
     ;
 
-signalDefinition: 'signal' signalType? ID arrayDimension*;
+signalDefinition: 'signal' signalType? ('{' args '}')? ID arrayDimension*;
 
 signalType: 'input' | 'output' ;
 
@@ -145,6 +149,8 @@ rhsValue: expression | blockInstantiation ;
 blockInstantiation: ID '(' (intSequence | args)* ')' ;
 
 arrayDimension: '[' (INT | ID) ']' ;
+
+argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
 
 args: ID (',' ID)* ;
 
