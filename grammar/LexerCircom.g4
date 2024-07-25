@@ -1,16 +1,7 @@
 lexer grammar LexerCircom;
 
-PRAGMA_DECLARATION
-    : 'pragma' VERSION ';'
-    | 'pragma' 'custom_templates' ';'
-    ;
-
 VERSION
-    : 'circom' INT '.' INT '.' INT
-    ;
-
-INCLUDE_DECLARATION
-    : 'include' PACKAGE_NAME ';'
+    : INT '.' INT '.' INT
     ;
 
 PACKAGE_NAME
@@ -22,13 +13,11 @@ QUALIFIED_PACKAGE_NAME
     :  .*? '.circom'?
     ;
 
-COMPONENT_DEFINITION: 'component' ID ;
-
 SIGNAL_TYPE: 'input' | 'output' ;
 
 ASSIGNMENT: '=' ;
 
-ASSIGNMENT_OP: '+=' | '-=' | '*=' | '**=' | '/=' | '\\=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' ;
+ASSIGMENT_OP: '+=' | '-=' | '*=' | '**=' | '/=' | '\\=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' ;
 
 SELF_OP: '++' | '--' ;
 
@@ -36,30 +25,23 @@ LEFT_ASSIGNMENT: '<--' | '<==' ;
 
 RIGHT_ASSIGNMENT: '-->' | '==>' ;
 
-CONSTRATINT_EQ: '===' ;
+CONSTRAINT_EQ: '===' ;
 
-ARGS_AND_UNDERSCORE: ('_' | ID) (',' ('_' | ID) )* ;
+ID: '_'* LETTER (LETTER | DIGIT | '_' | '$')* ;             // match identifiers
 
-ARGS: ID (',' ID)* ;
+INT: DIGIT+ ;                                               // match integers
 
-INT_SEQUENCE: INT (',' INT)* ;
+DIGIT: [0-9] ;                                              // match single digit
 
-ID: '_'* LETTER (LETTER | DIGIT | '_' | '$')* ;              // match identifiers
-
-INT: DIGIT+ ;                                                // match integers
-
-DIGIT: [0-9] ;                                               // match single digit
-
-LETTER: [a-zA-Z] ;                                           // match single letter
+LETTER: [a-zA-Z] ;                                          // match single letter
 
 COMMENT
-    : '/*' .*? '*/'             -> channel(HIDDEN)           // match anything between /* and */
+    : '/*' .*? '*/'    -> channel(HIDDEN)                   // match anything between /* and */
     ;
 
 LINE_COMMENT
-    : '//' ~[\r\n]* '\r'? '\n'  -> channel(HIDDEN)
+    : '//' ~[\r\n]* '\r'? '\n' -> channel(HIDDEN)
     ;
 
-WS  : [ \r\t\u000C\n]+          -> channel(HIDDEN)
+WS  : [ \r\t\u000C\n]+ -> channel(HIDDEN)
     ;
-

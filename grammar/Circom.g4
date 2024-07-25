@@ -3,8 +3,17 @@ grammar Circom;
 import LexerCircom;
 
 circuit
-    :   PRAGMA_DECLARATION+ INCLUDE_DECLARATION* blockDeclaration* componentMainDeclaration?
+    :   pragmaDeclaration+ includeDeclaration* blockDeclaration* componentMainDeclaration?
         EOF
+    ;
+
+pragmaDeclaration
+    : 'pragma' 'circom' VERSION ';'
+    | 'pragma' 'custom_templates' ';'
+    ;
+
+includeDeclaration
+    : 'include' PACKAGE_NAME ';'
     ;
 
 blockDeclaration
@@ -13,14 +22,14 @@ blockDeclaration
     ;
 
 functionDeclaration
-    : 'function' ID '(' ARGS* ')' functionStmt
+    : 'function' ID '(' args* ')' functionStmt
     ;
 
 functionStmt
     : '{' functionStmt* '}'
     | ID SELF_OP
     | varDeclaration
-    | expression (ASSIGNMENT | ASSIGNMENT_OP) expression
+    | expression (ASSIGNMENT | ASSIGMENT_OP) expression
     | 'if' parExpression functionStmt ('else' functionStmt)?
     | 'while' parExpression functionStmt
     | 'for' '(' forControl ')' functionStmt
@@ -29,12 +38,12 @@ functionStmt
     ;
 
 templateDeclaration
-    : 'template' ID '(' ARGS* ')' statement*
-    | 'template' 'custom' ID '(' ARGS* ')' statement*
+    : 'template' ID '(' args* ')' statement*
+    | 'template' 'custom' ID '(' args* ')' statement*
     ;
 
 componentMainDeclaration
-    : 'component' 'main' ('{' 'public' '[' ARGS ']'  '}')? '=' ID '(' INT_SEQUENCE* ')' ';'
+    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' intSequence* ')' ';'
     ;
 
 statement
@@ -44,13 +53,13 @@ statement
     | signalDeclaration
     | componentDeclaration
     | blockInstantiation
-    | expression (ASSIGNMENT | CONSTRATINT_EQ) expression
-    | (primary | (variableDefinition '.' variableDefinition)) (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression
+    | expression (ASSIGNMENT | CONSTRAINT_EQ) expression
+    | (primary | ((ID arrayDimension*) '.' (ID arrayDimension*))) (LEFT_ASSIGNMENT | ASSIGMENT_OP) expression
     | expression RIGHT_ASSIGNMENT primary
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation)
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_'
-    | '(' ARGS_AND_UNDERSCORE ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation
-    | blockInstantiation RIGHT_ASSIGNMENT '(' ARGS_AND_UNDERSCORE ')'
+    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation
+    | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')'
     | 'if' parExpression statement ('else' statement)?
     | 'while' parExpression statement
     | 'for' '(' forControl ')' statement
@@ -84,39 +93,46 @@ expression
 primary
     : '(' expression ')'
     | '[' expression (',' expression)* ']'
-    | variableDefinition
-    | INT_SEQUENCE
-    | ARGS
+    | intSequence
+    | args
+    | ID arrayDimension*
     | INT
     ;
 
+componentDefinition: 'component' ID ;
+
 componentDeclaration
-    : COMPONENT_DEFINITION arrayDimension* (ASSIGNMENT blockInstantiation)?
+    : componentDefinition arrayDimension* (ASSIGNMENT blockInstantiation)?
     ;
 
-signalDefinition: 'signal' SIGNAL_TYPE? ('{' ARGS '}')? variableDefinition;
+signalDefinition: 'signal' SIGNAL_TYPE? ('{' args '}')? ID arrayDimension*;
 
 signalDeclaration
     : signalDefinition (LEFT_ASSIGNMENT rhsValue)?
-    | signalDefinition (',' variableDefinition)*
+    | signalDefinition (',' ID arrayDimension*)*
     ;
 
-varDefinition: 'var' variableDefinition ;
+varDefinition: 'var' ID arrayDimension* ;
 
 varDeclaration
     : varDefinition (ASSIGNMENT rhsValue)?
-    | varDefinition (',' variableDefinition)*
+    | varDefinition (',' ID arrayDimension*)*
     ;
 
 rhsValue: expression | blockInstantiation ;
 
 componentCall
-    : '(' LEFT_ASSIGNMENT? expression (',' LEFT_ASSIGNMENT? expression)* ')'
+    : '(' expression (',' expression)* ')'
+    | '(' ID LEFT_ASSIGNMENT expression (',' ID LEFT_ASSIGNMENT expression)* ')'
     | '(' expression RIGHT_ASSIGNMENT ID (',' expression RIGHT_ASSIGNMENT ID)* ')'
     ;
 
 blockInstantiation: ID '(' ((expression)* | (expression (',' expression)*)) ')' componentCall? ;
 
-variableDefinition: ID arrayDimension* ;
+arrayDimension: '[' (INT | ID | expression) ']' ;
 
-arrayDimension: '[' expression ']' ;
+argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
+
+args: ID (',' ID)* ;
+
+intSequence: INT (',' INT)* ;
