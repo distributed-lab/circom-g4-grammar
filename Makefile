@@ -23,5 +23,9 @@ show:
 	javac $(OUTPUT_DIR)/*.java
 	$(GRUN) Circom circuit -gui
 
+test:
+	go generate ./...
+	go test
+
 clean:
 	rm -rf $(OUTPUT_DIR)
