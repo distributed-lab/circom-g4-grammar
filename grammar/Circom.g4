@@ -93,10 +93,10 @@ expression
 primary
     : '(' expression ')'
     | '[' expression (',' expression)* ']'
-    | intSequence
-    | args
-    | ID arrayDimension*
     | INT
+    | ID arrayDimension*
+    | args
+    | intSequence
     ;
 
 componentDefinition: 'component' ID ;
