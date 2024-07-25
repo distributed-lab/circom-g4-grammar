@@ -1,0 +1,3 @@
+[submodule "iden3-circuits"]
+	path = iden3-circuits
+	url = https://github.com/iden3/circuits.git

@@ -23,7 +23,7 @@ packageName
     ;
 
 qualifiedPackageName
-    :  ('./' | '../')* ID ('/'+ ID)* '.circom'?
+    :  .*? '.circom'?
     ;
 
 blockDeclaration
@@ -60,38 +60,35 @@ statement
     : '{' statement* '}'
     | ID selfOp
     | varDeclaration
-    | signalDeclaration componentCall?
+    | signalDeclaration
     | componentDeclaration
+    | blockInstantiation
     | expression (assignment | constraintEq) expression
-    | primary (leftAssignment | assigmentOp) expression
+    | (primary | ((ID arrayDimension*) '.' (ID arrayDimension*))) (leftAssignment | assigmentOp) expression
     | expression rightAssignment primary
-    | '_' (assignment | leftAssignment) (expression | (blockInstantiation componentCall?))
-    | (expression | (blockInstantiation componentCall?)) rightAssignment '_'
-    | '(' argsWithUnderscore ')' (assignment | leftAssignment) (blockInstantiation componentCall?)
-    | (blockInstantiation componentCall?) rightAssignment '(' argsWithUnderscore ')'
+    | '_' (assignment | leftAssignment) (expression | blockInstantiation)
+    | (expression | blockInstantiation) rightAssignment '_'
+    | '(' argsWithUnderscore ')' (assignment | leftAssignment) blockInstantiation
+    | blockInstantiation rightAssignment '(' argsWithUnderscore ')'
     | 'if' parExpression statement ('else' statement)?
     | 'while' parExpression statement
     | 'for' '(' forControl ')' statement
+    | 'assert' parExpression
     | statement ';'
-    ;
-
-componentCall
-    : '(' expression (',' expression)* ')'
-    | '(' ID leftAssignment expression (',' ID leftAssignment expression)* ')'
-    | '(' expression rightAssignment ID (',' expression rightAssignment ID)* ')'
     ;
 
 forControl: forInit ';' expression ';' forUpdate ;
 
 forInit: varDefinition (assignment rhsValue)? ;
 
-forUpdate: expression | (ID selfOp) ;
+forUpdate: expression | (ID (selfOp | (assignment expression))) ;
 
 parExpression: '(' expression ')' ;
 
 expression
     : primary
     | expression '.' ID
+    | ID '.' ID '[' expression ']'
     | expression '?' expression ':' expression
     | blockInstantiation
     | ('~' | '!' | '-') expression
@@ -105,7 +102,9 @@ expression
 
 primary
     : '(' expression ')'
-    | '[' (intSequence | args)+ ']'
+    | '[' expression (',' expression)* ']'
+    | intSequence
+    | args
     | ID arrayDimension*
     | INT
     ;
@@ -146,9 +145,15 @@ constraintEq: '===' ;
 
 rhsValue: expression | blockInstantiation ;
 
-blockInstantiation: ID '(' (intSequence | args)* ')' ;
+componentCall
+    : '(' expression (',' expression)* ')'
+    | '(' ID leftAssignment expression (',' ID leftAssignment expression)* ')'
+    | '(' expression rightAssignment ID (',' expression rightAssignment ID)* ')'
+    ;
 
-arrayDimension: '[' (INT | ID) ']' ;
+blockInstantiation: ID '(' ((expression)* | (expression (',' expression)*)) ')' componentCall? ;
+
+arrayDimension: '[' (INT | ID | expression) ']' ;
 
 argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
 
