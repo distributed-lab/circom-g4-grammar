@@ -5,7 +5,6 @@ description: setup
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
     - name: Setup Go
       uses: actions/setup-go@v5
       with:
