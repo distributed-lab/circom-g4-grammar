@@ -43,7 +43,7 @@ templateDeclaration
     ;
 
 componentMainDeclaration
-    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' intSequence* ')' ';'
+    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' numSequence* ')' ';'
     ;
 
 statement
@@ -93,10 +93,10 @@ expression
 primary
     : '(' expression ')'
     | '[' expression (',' expression)* ']'
-    | INT
+    | NUMBER
     | ID arrayDimension*
     | args
-    | intSequence
+    | numSequence
     ;
 
 componentDefinition: 'component' ID ;
@@ -129,10 +129,10 @@ componentCall
 
 blockInstantiation: ID '(' ((expression)* | (expression (',' expression)*)) ')' componentCall? ;
 
-arrayDimension: '[' (INT | ID | expression) ']' ;
+arrayDimension: '[' (NUMBER | ID | expression) ']' ;
 
 argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
 
 args: ID (',' ID)* ;
 
-intSequence: INT (',' INT)* ;
+numSequence: NUMBER (',' NUMBER)* ;
