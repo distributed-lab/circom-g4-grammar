@@ -1,0 +1,15 @@
+name: setup
+
+description: setup
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21.x'
+    - name: Install dependencies
+      shell: bash
+      run: go get .
