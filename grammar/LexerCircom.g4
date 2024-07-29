@@ -1,17 +1,10 @@
 lexer grammar LexerCircom;
 
 VERSION
-    : INT '.' INT '.' INT
+    : NUMBER '.' NUMBER '.' NUMBER
     ;
 
-PACKAGE_NAME
-    : '"' QUALIFIED_PACKAGE_NAME '"'
-    ;
-
-fragment
-QUALIFIED_PACKAGE_NAME
-    :  .*? '.circom'?
-    ;
+PACKAGE_NAME: STRING ;
 
 SIGNAL_TYPE: INPUT | OUTPUT ;
 
@@ -112,13 +105,15 @@ RIGHT_ASSIGNMENT: '-->' | '==>' ;
 
 CONSTRAINT_EQ: '===' ;
 
-ID: '_'* LETTER (LETTER | DIGIT | '_' | '$')* ;             // match identifiers
+ID          :   LETTER (LETTER|DIGIT)*;
+fragment
+LETTER      :   [a-zA-Z\u0080-\u00FF_$] ;
 
-INT: DIGIT+ ;                                               // match integers
+NUMBER: DIGIT+ ;                                            // match integers
+fragment
+DIGIT: [0-9] ;                                              // match single digit                                          // match single letter
 
-DIGIT: [0-9] ;                                              // match single digit
-
-LETTER: [a-zA-Z] ;                                          // match single letter
+STRING      :   '"' .*? '"' ;
 
 COMMENT
     : '/*' .*? '*/'    -> channel(HIDDEN)                   // match anything between /* and */
