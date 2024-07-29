@@ -13,7 +13,92 @@ QUALIFIED_PACKAGE_NAME
     :  .*? '.circom'?
     ;
 
-SIGNAL_TYPE: 'input' | 'output' ;
+SIGNAL_TYPE: INPUT | OUTPUT ;
+
+SIGNAL
+    : 'signal' ;
+
+INPUT
+    : 'input' ;
+
+OUTPUT
+    : 'output' ;
+
+PUBLIC
+    : 'public' ;
+
+TEMPLATE
+    : 'template' ;
+
+COMPONENT
+    : 'component' ;
+
+VAR
+    : 'var' ;
+
+FUNCTION
+    : 'function' ;
+
+RETURN
+    : 'return' ;
+
+IF
+    : 'if' ;
+
+ELSE
+    : 'else' ;
+
+FOR
+    : 'for' ;
+
+WHILE
+    : 'while' ;
+
+DO
+    : 'do' ;
+
+LOG
+    : 'log' ;
+
+ASSERT
+    : 'assert' ;
+
+INCLUDE
+    : 'include' ;
+
+CUSTOM
+    : 'custom' ;
+
+PRAGMA
+    : 'pragma' ;
+
+CIRCOM
+    : 'circom' ;
+
+CUSTOM_TEMPLATES
+    : 'custom_templates' ;
+
+MAIN
+    : 'main' ;
+
+PARALLEL
+    : 'parallel' ;
+
+PARENTHESIS_OPEN: '(' ;
+
+PARENTHESIS_CLOSE: ')' ;
+
+SQUER_BRACKET_OPEN: '[' ;
+
+SQUER_BRACKET_CLOSE: ']' ;
+
+CURLY_BRACKET_OPEN: '{' ;
+
+CURLY_BRACKET_CLOSE: '}' ;
+
+SEMICOLON: ';' ;
+
+COMMA: ',' ;
 
 ASSIGNMENT: '=' ;
 
