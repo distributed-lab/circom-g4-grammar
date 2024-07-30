@@ -77,17 +77,14 @@ MAIN
 PARALLEL
     : 'parallel' ;
 
-PARENTHESIS_OPEN: '(' ;
+LP: '(' ;
+RP: ')' ;
 
-PARENTHESIS_CLOSE: ')' ;
+LB: '[' ;
+RB: ']' ;
 
-SQUER_BRACKET_OPEN: '[' ;
-
-SQUER_BRACKET_CLOSE: ']' ;
-
-CURLY_BRACKET_OPEN: '{' ;
-
-CURLY_BRACKET_CLOSE: '}' ;
+LC: '{' ;
+RC: '}' ;
 
 SEMICOLON: ';' ;
 
@@ -113,7 +110,8 @@ NUMBER: DIGIT+ ;                                            // match integers
 fragment
 DIGIT: [0-9] ;                                              // match single digit                                          // match single letter
 
-STRING      :   '"' .*? '"' ;
+STRING      :   '"' (ESC|.)*? '"' ;
+fragment ESC: '\\' [btnrf"\\] ;
 
 COMMENT
     : '/*' .*? '*/'    -> channel(HIDDEN)                   // match anything between /* and */

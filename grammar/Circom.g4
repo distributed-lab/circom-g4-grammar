@@ -43,7 +43,7 @@ templateDeclaration
     ;
 
 componentMainDeclaration
-    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' numSequence* ')' ';'
+    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' expression* ')' ';'
     ;
 
 statement
