@@ -22,7 +22,11 @@ blockDeclaration
     ;
 
 functionDeclaration
-    : 'function' ID '(' args* ')' '{' functionStmt* '}'
+    : 'function' ID '(' args* ')' functionBlock
+    ;
+
+functionBlock
+    : '{' functionStmt* '}'
     ;
 
 functionStmt
@@ -38,8 +42,12 @@ functionStmt
     ;
 
 templateDeclaration
-    : 'template' ID '(' args* ')' '{' statement* '}'
-    | 'template' 'custom' ID '(' args* ')' '{' statement* '}'
+    : 'template' ID '(' args* ')' templateBlock
+    | 'template' 'custom' ID '(' args* ')' templateBlock
+    ;
+
+templateBlock
+    : '{' statement* '}'
     ;
 
 componentMainDeclaration
