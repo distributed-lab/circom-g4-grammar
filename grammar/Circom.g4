@@ -43,7 +43,7 @@ templateDeclaration
     ;
 
 componentMainDeclaration
-    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' (expression ','?)* ')' ';'
+    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' expressionList? ')' ';'
     ;
 
 statement
@@ -80,7 +80,7 @@ expression
     | blockInstantiation
     | expression '.' ID ('[' expression ']')?
     | expression '?' expression ':' expression
-    | ('~' | '!' | '-') expression
+    | ('~' | '!') expression
     | expression '**' expression
     | expression ('*' | '/' | '\\' | '%') expression
     | expression ('+' | '-') expression
@@ -91,7 +91,7 @@ expression
 
 primary
     : '(' expression ')'
-    | '[' (expression ','?)+ ']'
+    | '[' expressionList ']'
     | NUMBER
     | identifier
     | args
@@ -121,19 +121,21 @@ varDeclaration
 rhsValue: expression | blockInstantiation ;
 
 componentCall
-    : '(' (expression ','?)* ')'
-    | '(' (ID LEFT_ASSIGNMENT expression ','?)* ')'
-    | '(' (expression RIGHT_ASSIGNMENT ID ','?)* ')'
+    : '(' expressionList? ')'
+    | '(' ID LEFT_ASSIGNMENT expression (',' ID LEFT_ASSIGNMENT expression)* ')'
+    | '(' expression RIGHT_ASSIGNMENT ID (',' expression RIGHT_ASSIGNMENT ID)* ')'
     ;
 
-blockInstantiation: ID '(' (expression ','?)* ')' componentCall? ;
+blockInstantiation: ID '(' expressionList? ')' componentCall? ;
 
 arrayDimension: '[' (NUMBER | ID | expression) ']' ;
 
 argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
 
-args: (ID ','?)+ ;
+args: ID (',' ID)* ;
 
-numSequence: (NUMBER ','?)+ ;
+numSequence: NUMBER (',' NUMBER)* ;
+
+expressionList: expression (',' expression)* ;
 
 identifier: ID arrayDimension* ;
