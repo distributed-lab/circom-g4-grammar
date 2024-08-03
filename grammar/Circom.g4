@@ -30,7 +30,7 @@ functionBlock
     ;
 
 functionStmt
-    : '{' functionStmt* '}'
+    : functionBlock
     | ID SELF_OP
     | varDeclaration
     | expression (ASSIGNMENT | ASSIGMENT_OP) expression
@@ -47,15 +47,15 @@ templateDeclaration
     ;
 
 templateBlock
-    : '{' statement* '}'
+    : '{' templateStmt* '}'
     ;
 
 componentMainDeclaration
     : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' expressionList? ')' ';'
     ;
 
-statement
-    : '{' statement* '}'
+templateStmt
+    : templateBlock
     | ID SELF_OP
     | varDeclaration
     | signalDeclaration
@@ -68,11 +68,11 @@ statement
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_'
     | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation
     | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')'
-    | 'if' parExpression statement ('else' statement)?
-    | 'while' parExpression statement
-    | 'for' '(' forControl ')' statement
+    | 'if' parExpression templateStmt ('else' templateStmt)?
+    | 'while' parExpression templateStmt
+    | 'for' '(' forControl ')' templateStmt
     | 'assert' parExpression
-    | statement ';'
+    | templateStmt ';'
     ;
 
 forControl: forInit ';' expression ';' forUpdate ;
