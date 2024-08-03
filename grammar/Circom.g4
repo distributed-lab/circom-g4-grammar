@@ -31,13 +31,13 @@ functionBlock
 
 functionStmt
     : functionBlock
-    | ID SELF_OP
-    | varDeclaration
-    | expression (ASSIGNMENT | ASSIGMENT_OP) expression
+    | ID SELF_OP ';'
+    | varDeclaration ';'
+    | expression (ASSIGNMENT | ASSIGMENT_OP) expression ';'
     | 'if' parExpression functionStmt ('else' functionStmt)?
     | 'while' parExpression functionStmt
     | 'for' '(' forControl ')' functionStmt
-    | 'return' expression
+    | 'return' expression ';'
     | functionStmt ';'
     ;
 
@@ -56,22 +56,22 @@ componentMainDeclaration
 
 templateStmt
     : templateBlock
-    | ID SELF_OP
-    | varDeclaration
-    | signalDeclaration
-    | componentDeclaration
-    | blockInstantiation
-    | expression (ASSIGNMENT | CONSTRAINT_EQ) expression
-    | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGMENT_OP) expression
-    | expression RIGHT_ASSIGNMENT primary
-    | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation)
-    | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_'
-    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation
-    | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')'
+    | ID SELF_OP ';'
+    | varDeclaration ';'
+    | signalDeclaration ';'
+    | componentDeclaration ';'
+    | blockInstantiation ';'
+    | expression (ASSIGNMENT | CONSTRAINT_EQ) expression ';'
+    | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGMENT_OP) expression ';'
+    | expression RIGHT_ASSIGNMENT primary ';'
+    | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
+    | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
+    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation ';'
+    | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')' ';'
     | 'if' parExpression templateStmt ('else' templateStmt)?
     | 'while' parExpression templateStmt
     | 'for' '(' forControl ')' templateStmt
-    | 'assert' parExpression
+    | 'assert' parExpression ';'
     | templateStmt ';'
     ;
 
