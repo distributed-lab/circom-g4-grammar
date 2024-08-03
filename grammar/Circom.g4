@@ -22,7 +22,7 @@ blockDeclaration
     ;
 
 functionDeclaration
-    : 'function' ID '(' args* ')' functionStmt
+    : 'function' ID '(' args* ')' '{' functionStmt* '}'
     ;
 
 functionStmt
@@ -38,12 +38,12 @@ functionStmt
     ;
 
 templateDeclaration
-    : 'template' ID '(' args* ')' statement*
-    | 'template' 'custom' ID '(' args* ')' statement*
+    : 'template' ID '(' args* ')' '{' statement* '}'
+    | 'template' 'custom' ID '(' args* ')' '{' statement* '}'
     ;
 
 componentMainDeclaration
-    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' (expression (',' expression)*)* ')' ';'
+    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' (expression ','?)* ')' ';'
     ;
 
 statement
@@ -54,7 +54,7 @@ statement
     | componentDeclaration
     | blockInstantiation
     | expression (ASSIGNMENT | CONSTRAINT_EQ) expression
-    | (primary | ((ID arrayDimension*) '.' (ID arrayDimension*))) (LEFT_ASSIGNMENT | ASSIGMENT_OP) expression
+    | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGMENT_OP) expression
     | expression RIGHT_ASSIGNMENT primary
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation)
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_'
@@ -77,10 +77,9 @@ parExpression: '(' expression ')' ;
 
 expression
     : primary
-    | expression '.' ID
-    | ID '.' ID '[' expression ']'
-    | expression '?' expression ':' expression
     | blockInstantiation
+    | expression '.' ID ('[' expression ']')?
+    | expression '?' expression ':' expression
     | ('~' | '!' | '-') expression
     | expression '**' expression
     | expression ('*' | '/' | '\\' | '%') expression
@@ -92,9 +91,9 @@ expression
 
 primary
     : '(' expression ')'
-    | '[' expression (',' expression)* ']'
+    | '[' (expression ','?)+ ']'
     | NUMBER
-    | ID arrayDimension*
+    | identifier
     | args
     | numSequence
     ;
@@ -105,34 +104,36 @@ componentDeclaration
     : componentDefinition arrayDimension* (ASSIGNMENT blockInstantiation)?
     ;
 
-signalDefinition: 'signal' SIGNAL_TYPE? ('{' args '}')? ID arrayDimension*;
+signalDefinition: 'signal' SIGNAL_TYPE? ('{' args '}')? identifier;
 
 signalDeclaration
     : signalDefinition (LEFT_ASSIGNMENT rhsValue)?
-    | signalDefinition (',' ID arrayDimension*)*
+    | signalDefinition (',' identifier)*
     ;
 
-varDefinition: 'var' ID arrayDimension* ;
+varDefinition: 'var' identifier ;
 
 varDeclaration
     : varDefinition (ASSIGNMENT rhsValue)?
-    | varDefinition (',' ID arrayDimension*)*
+    | varDefinition (',' identifier)*
     ;
 
 rhsValue: expression | blockInstantiation ;
 
 componentCall
-    : '(' expression (',' expression)* ')'
-    | '(' ID LEFT_ASSIGNMENT expression (',' ID LEFT_ASSIGNMENT expression)* ')'
-    | '(' expression RIGHT_ASSIGNMENT ID (',' expression RIGHT_ASSIGNMENT ID)* ')'
+    : '(' (expression ','?)* ')'
+    | '(' (ID LEFT_ASSIGNMENT expression ','?)* ')'
+    | '(' (expression RIGHT_ASSIGNMENT ID ','?)* ')'
     ;
 
-blockInstantiation: ID '(' ((expression)* | (expression (',' expression)*)) ')' componentCall? ;
+blockInstantiation: ID '(' (expression ','?)* ')' componentCall? ;
 
 arrayDimension: '[' (NUMBER | ID | expression) ']' ;
 
 argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
 
-args: ID (',' ID)* ;
+args: (ID ','?)+ ;
 
-numSequence: NUMBER (',' NUMBER)* ;
+numSequence: (NUMBER ','?)+ ;
+
+identifier: ID arrayDimension* ;
