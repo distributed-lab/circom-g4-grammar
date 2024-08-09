@@ -79,7 +79,7 @@ forControl: forInit ';' expression ';' forUpdate ;
 
 forInit: varDefinition (ASSIGNMENT rhsValue)? ;
 
-forUpdate: expression | (ID (SELF_OP | (ASSIGNMENT expression))) ;
+forUpdate: ID (SELF_OP | (ASSIGNMENT expression)) ;
 
 parExpression: '(' expression ')' ;
 
