@@ -33,7 +33,7 @@ functionStmt
     : functionBlock
     | ID SELF_OP ';'
     | varDeclaration ';'
-    | expression (ASSIGNMENT | ASSIGMENT_OP) expression ';'
+    | expression (ASSIGNMENT | ASSIGNMENT_OP) expression ';'
     | 'if' parExpression functionStmt ('else' functionStmt)?
     | 'while' parExpression functionStmt
     | 'for' '(' forControl ')' functionStmt
@@ -62,7 +62,7 @@ templateStmt
     | componentDeclaration ';'
     | blockInstantiation ';'
     | expression (ASSIGNMENT | CONSTRAINT_EQ) expression ';'
-    | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGMENT_OP) expression ';'
+    | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
     | expression RIGHT_ASSIGNMENT primary ';'
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
@@ -79,7 +79,7 @@ forControl: forInit ';' expression ';' forUpdate ;
 
 forInit: varDefinition (ASSIGNMENT rhsValue)? ;
 
-forUpdate: ID (SELF_OP | (ASSIGNMENT expression)) ;
+forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_OP) expression)) | SELF_OP ID ;
 
 parExpression: '(' expression ')' ;
 
