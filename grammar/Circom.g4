@@ -33,7 +33,7 @@ functionStmt
     : functionBlock
     | ID SELF_OP ';'
     | varDeclaration ';'
-    | expression (ASSIGNMENT | ASSIGNMENT_OP) expression ';'
+    | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'
     | 'if' parExpression functionStmt ('else' functionStmt)?
     | 'while' parExpression functionStmt
     | 'for' '(' forControl ')' functionStmt
@@ -61,7 +61,7 @@ templateStmt
     | signalDeclaration ';'
     | componentDeclaration ';'
     | blockInstantiation ';'
-    | expression (ASSIGNMENT | CONSTRAINT_EQ) expression ';'
+    | identifier (ASSIGNMENT | CONSTRAINT_EQ) expression ';'
     | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
     | expression RIGHT_ASSIGNMENT primary ';'
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
