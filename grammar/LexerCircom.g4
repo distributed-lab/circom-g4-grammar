@@ -1,78 +1,54 @@
 lexer grammar LexerCircom;
 
-VERSION
-    : NUMBER '.' NUMBER '.' NUMBER
-    ;
+VERSION: NUMBER '.' NUMBER '.' NUMBER ;
 
 PACKAGE_NAME: STRING ;
 
 SIGNAL_TYPE: INPUT | OUTPUT ;
 
-SIGNAL
-    : 'signal' ;
+SIGNAL: 'signal' ;
 
-INPUT
-    : 'input' ;
+INPUT: 'input' ;
 
-OUTPUT
-    : 'output' ;
+OUTPUT: 'output' ;
 
-PUBLIC
-    : 'public' ;
+PUBLIC: 'public' ;
 
-TEMPLATE
-    : 'template' ;
+TEMPLATE: 'template' ;
 
-COMPONENT
-    : 'component' ;
+COMPONENT: 'component' ;
 
-VAR
-    : 'var' ;
+VAR: 'var' ;
 
-FUNCTION
-    : 'function' ;
+FUNCTION: 'function' ;
 
-RETURN
-    : 'return' ;
+RETURN: 'return' ;
 
-IF
-    : 'if' ;
+IF: 'if' ;
 
-ELSE
-    : 'else' ;
+ELSE: 'else' ;
 
-FOR
-    : 'for' ;
+FOR: 'for' ;
 
-WHILE
-    : 'while' ;
+WHILE: 'while' ;
 
-DO
-    : 'do' ;
+DO: 'do' ;
 
-LOG
-    : 'log' ;
+LOG: 'log' ;
 
-ASSERT
-    : 'assert' ;
+ASSERT: 'assert' ;
 
-INCLUDE
-    : 'include' ;
+INCLUDE: 'include' ;
 
-CUSTOM
-    : 'custom' ;
+CUSTOM: 'custom' ;
 
-PRAGMA
-    : 'pragma' ;
+PRAGMA: 'pragma' ;
 
-CIRCOM
-    : 'circom' ;
+CIRCOM: 'circom' ;
 
-CUSTOM_TEMPLATES
-    : 'custom_templates' ;
+CUSTOM_TEMPLATES: 'custom_templates' ;
 
-MAIN
-    : 'main' ;
+MAIN: 'main' ;
 
 PARALLEL
     : 'parallel' ;
@@ -101,6 +77,35 @@ LEFT_ASSIGNMENT: '<--' | '<==' ;
 RIGHT_ASSIGNMENT: '-->' | '==>' ;
 
 CONSTRAINT_EQ: '===' ;
+
+NOT: '!' ;
+BNOT: '~' ;
+
+POW: '**' ;
+
+MUL: '*' ;
+DIV: '/' ;
+QUO: '\\' ;
+MOD: '%' ;
+
+ADD: '+' ;
+SUB: '-' ;
+
+SHL: '<<' ;
+SHR: '>>' ;
+
+BAND: '&' ;
+BXOR: '^' ;
+BOR: '|' ;
+
+EQ: '==' ;
+NE: '!=' ;
+GT: '>' ;
+LT: '<' ;
+LE: '>=' ;
+GE: '<=' ;
+AND: '&&' ;
+OR: '||' ;
 
 ID          :   LETTER (LETTER|DIGIT)*;
 fragment
