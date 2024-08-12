@@ -30,15 +30,14 @@ functionBlock
     ;
 
 functionStmt
-    : functionBlock
-    | ID SELF_OP ';'
-    | varDeclaration ';'
-    | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'
-    | 'if' parExpression functionStmt ('else' functionStmt)?
-    | 'while' parExpression functionStmt
-    | 'for' '(' forControl ')' functionStmt
-    | 'return' expression ';'
-    | functionStmt ';'
+    : functionBlock                                             #FuncBlock
+    | ID SELF_OP ';'                                            #FuncSelfOp
+    | varDeclaration ';'                                        #FuncVarDeclaration
+    | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'    #FuncAssignmentExpression
+    | 'if' parExpression functionStmt ('else' functionStmt)?    #IfFuncStmt
+    | 'while' parExpression functionStmt                        #WhileFuncStmt
+    | 'for' '(' forControl ')' functionStmt                     #ForFuncStmt
+    | 'return' expression ';'                                   #ReturnFuncStmt
     ;
 
 templateDeclaration
@@ -73,7 +72,6 @@ templateStmt
     | 'while' parExpression templateStmt
     | 'for' '(' forControl ')' templateStmt
     | 'assert' parExpression ';'
-    | templateStmt ';'
     ;
 
 forControl: forInit ';' expression ';' forUpdate ;
@@ -85,18 +83,17 @@ forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_OP) expression)) | SELF_OP ID
 parExpression: '(' expression ')' ;
 
 expression
-    : primary
-    | blockInstantiation
-    | expression '.' ID ('[' expression ']')?
-    | expression '?' expression ':' expression
-    | ('~' | '!') expression
-    | expression '**' expression
-    | expression ('*' | '/' | '\\' | '%') expression
-    | expression ('+' | '-') expression
-    | expression ('<<' | '>>') expression
-    | expression ('&' | '^' | '|') expression
-    | expression ('==' | '!=' | '>' | '<' | '<=' | '>=' | '&&' | '||') expression
-    ;
+   : primary                                                                          #PrimaryExpression
+   | blockInstantiation                                                               #BlockInstantiationExpression
+   | expression '.' ID ('[' expression ']')?                                          #DotExpression
+   | expression '?' expression ':' expression                                         #TernaryExpression
+   | op=('~' | '!') expression                                                        #UnaryExpression
+   | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #BinaryExpression
+   | expression op=('+' | '-') expression                                             #BinaryExpression
+   | expression op=('<<' | '>>') expression                                           #BinaryExpression
+   | expression op=('&' | '^' | '|') expression                                       #BinaryExpression
+   | expression op=('==' | '!=' | '>' | '<' | '<=' | '>=' | '&&' | '||') expression   #BinaryExpression
+   ;
 
 primary
     : '(' expression ')'
