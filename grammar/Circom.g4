@@ -86,8 +86,8 @@ expression
    : primary                                                                          #PrimaryExpression
    | blockInstantiation                                                               #BlockInstantiationExpression
    | expression '.' ID ('[' expression ']')?                                          #DotExpression
-   | expression '?' expression ':' expression                                         #TernaryExpression
    | op=('~' | '!') expression                                                        #UnaryExpression
+   | expression '?' expression ':' expression                                         #TernaryExpression
    | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #BinaryExpression
    | expression op=('+' | '-') expression                                             #BinaryExpression
    | expression op=('<<' | '>>') expression                                           #BinaryExpression
