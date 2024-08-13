@@ -108,7 +108,7 @@ primary
     ;
 
 logStmt
-    : 'log' '(' (STRING | expression) ')'
+    : 'log' '(' (STRING | expression)? ')'
     ;
 
 componentDefinition: 'component' ID ;
