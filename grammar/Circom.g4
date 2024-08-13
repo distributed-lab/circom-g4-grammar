@@ -3,7 +3,7 @@ grammar Circom;
 import LexerCircom;
 
 circuit
-    :   pragmaDeclaration+ includeDeclaration* blockDeclaration* componentMainDeclaration?
+    :   pragmaDeclaration* includeDeclaration* blockDeclaration* componentMainDeclaration?
         EOF
     ;
 
@@ -13,7 +13,7 @@ pragmaDeclaration
     ;
 
 includeDeclaration
-    : 'include' PACKAGE_NAME ';'
+    : 'include' STRING ';'
     ;
 
 blockDeclaration
@@ -38,6 +38,8 @@ functionStmt
     | 'while' parExpression functionStmt                        #WhileFuncStmt
     | 'for' '(' forControl ')' functionStmt                     #ForFuncStmt
     | 'return' expression ';'                                   #ReturnFuncStmt
+    | 'assert' parExpression ';'                                #AssertFuncStmt
+    | logStmt ';'                                               #LogFuncStmt
     ;
 
 templateDeclaration
@@ -63,7 +65,7 @@ templateStmt
     | (identifier ('.' ID)?) ASSIGNMENT expression ';'
     | expression CONSTRAINT_EQ expression ';'
     | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
-    | expression RIGHT_ASSIGNMENT primary ';'
+    | expression RIGHT_ASSIGNMENT (identifier ('.' identifier)?) ';'
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
     | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation ';'
@@ -72,11 +74,12 @@ templateStmt
     | 'while' parExpression templateStmt
     | 'for' '(' forControl ')' templateStmt
     | 'assert' parExpression ';'
+    | logStmt ';'
     ;
 
 forControl: forInit ';' expression ';' forUpdate ;
 
-forInit: varDefinition (ASSIGNMENT rhsValue)? ;
+forInit: 'var'? identifier (ASSIGNMENT rhsValue)? ;
 
 forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_OP) expression)) | SELF_OP ID ;
 
@@ -86,7 +89,7 @@ expression
    : primary                                                                          #PrimaryExpression
    | blockInstantiation                                                               #BlockInstantiationExpression
    | expression '.' ID ('[' expression ']')?                                          #DotExpression
-   | op=('~' | '!') expression                                                        #UnaryExpression
+   | op=('~' | '!' | '-') expression                                                  #UnaryExpression
    | expression '?' expression ':' expression                                         #TernaryExpression
    | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #BinaryExpression
    | expression op=('+' | '-') expression                                             #BinaryExpression
@@ -102,6 +105,10 @@ primary
     | identifier
     | args
     | numSequence
+    ;
+
+logStmt
+    : 'log' '(' (STRING | expression) ')'
     ;
 
 componentDefinition: 'component' ID ;

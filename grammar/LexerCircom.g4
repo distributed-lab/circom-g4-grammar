@@ -2,8 +2,6 @@ lexer grammar LexerCircom;
 
 VERSION: NUMBER '.' NUMBER '.' NUMBER ;
 
-PACKAGE_NAME: STRING ;
-
 SIGNAL_TYPE: INPUT | OUTPUT ;
 
 SIGNAL: 'signal' ;
@@ -111,9 +109,13 @@ ID          :   LETTER (LETTER|DIGIT)*;
 fragment
 LETTER      :   [a-zA-Z\u0080-\u00FF_$] ;
 
-NUMBER: DIGIT+ ;                                            // match integers
+NUMBER: DIGIT+ | HEX;                                       // match integers
 fragment
 DIGIT: [0-9] ;                                              // match single digit                                          // match single letter
+
+HEX :   '0' ('x'|'X') HEXDIGIT+ ;
+fragment
+HEXDIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 STRING      :   '"' (ESC|.)*? '"' ;
 fragment ESC: '\\' [btnrf"\\] ;
