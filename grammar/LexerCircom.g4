@@ -113,7 +113,7 @@ NUMBER: DIGIT+ | HEX;                                       // match integers
 fragment
 DIGIT: [0-9] ;                                              // match single digit                                          // match single letter
 
-HEX :   '0' ('x'|'X') HEXDIGIT+ ;
+HEX :   '0' 'x' HEXDIGIT+ ;
 fragment
 HEXDIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
 

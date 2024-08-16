@@ -22,7 +22,7 @@ blockDeclaration
     ;
 
 functionDeclaration
-    : 'function' ID '(' args* ')' functionBlock
+    : 'function' ID '(' args? ')' functionBlock
     ;
 
 functionBlock
@@ -43,8 +43,8 @@ functionStmt
     ;
 
 templateDeclaration
-    : 'template' ID '(' args* ')' templateBlock
-    | 'template' 'custom' ID '(' args* ')' templateBlock
+    : 'template' 'parallel'? ID '(' args? ')' templateBlock
+    | 'template' 'parallel'? 'custom' ID '(' args? ')' templateBlock
     ;
 
 templateBlock
