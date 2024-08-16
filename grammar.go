@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/antlr4-go/antlr/v4"
+	"github.com/pkg/errors"
+	"os"
 
 	bindings "github.com/distributed-lab/circom-g4-grammar/parser"
 )
@@ -38,12 +40,22 @@ func GetParser(input antlr.CharStream) *bindings.CircomParser {
 
 // ParseFile parses a single file and returns an error if parsing fails
 func ParseFile(filename string) error {
-	input, err := antlr.NewFileStream(filename)
+	// Open the file for reading
+	file, err := os.Open(filename)
 	if err != nil {
-		return fmt.Errorf("error creating file stream: %w", err)
+		fmt.Println("Error opening file:", err)
+		return errors.Wrap(err, "error opening file")
 	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			fmt.Println("Error closing file:", err)
+		}
+	}()
+	ioStream := antlr.NewIoStream(file)
 
-	parser := GetParser(input)
+	parser := GetParser(ioStream)
+	parser.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
+
 	parser.RemoveErrorListeners()
 	parser.BuildParseTrees = true
 
