@@ -54,7 +54,6 @@ func ParseFile(filename string) error {
 	ioStream := antlr.NewIoStream(file)
 
 	parser := GetParser(ioStream)
-	parser.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
 
 	parser.RemoveErrorListeners()
 	parser.BuildParseTrees = true
@@ -62,10 +61,21 @@ func ParseFile(filename string) error {
 	errorListener := &simpleErrorListener{}
 	parser.AddErrorListener(errorListener)
 
+	parser.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
 	tree := parser.Circuit()
 
 	if errorListener.hasErrors() {
-		return fmt.Errorf("syntax errors encountered in file %s", filename)
+		parser.GetInterpreter().SetPredictionMode(antlr.PredictionModeLL)
+
+		parser.RemoveErrorListeners()
+		parser.BuildParseTrees = true
+
+		errorListener := &simpleErrorListener{}
+		parser.AddErrorListener(errorListener)
+
+		if errorListener.hasErrors() {
+			return fmt.Errorf("syntax errors encountered in file %s", filename)
+		}
 	}
 
 	_ = tree // use the parse tree as needed
