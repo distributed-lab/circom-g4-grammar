@@ -65,6 +65,8 @@ func ParseFile(filename string) error {
 	tree := parser.Circuit()
 
 	if errorListener.hasErrors() {
+		fmt.Printf("Failed to parse (with weak stratagy) %s: %v\n", filename, errorListener.getErrors())
+
 		parser.GetInterpreter().SetPredictionMode(antlr.PredictionModeLL)
 
 		parser.RemoveErrorListeners()
