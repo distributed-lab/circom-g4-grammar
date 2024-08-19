@@ -20,12 +20,9 @@ function nbits(a) {
 
 template A(a, b, c) {}
 
-function nbits(a) {
-    signal input _in;
+template nbits(a) {
     var o_u_t;
     var o$o;
-    signal a;
-    signal output b;
     var x[3] = [2,8,4];
     var z[n];  // where n is a parameter of a template
     var dbl[16][2] = base;
@@ -40,8 +37,6 @@ function nbits(a) {
     signal out <== 2;
 
     var e4 = 1 && 0;
-
-    ~=e4;
 
     signal input in;
     signal output out[n];

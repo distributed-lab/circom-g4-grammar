@@ -1,42 +1,42 @@
-# Circom G4 Grammar Spec
+# Circom G4 Grammar Specification
 
-This repository represents a Circom grammar using ANTLR tool. 
+This repository provides a Circom grammar implementation in G4 format using the [ANTLR](https://www.antlr.org) tool. 
 
 ## Grammar Compatibility
 
-Source: https://github.com/iden3/circom/blob/master/parser/src/lang.lalrpop
+Source: [Circom Parser Grammar](https://github.com/iden3/circom/blob/master/parser/src/lang.lalrpop)
 
-Issues: 
+### Issues
 
-- The grammar described in the repository is not official one. Therefore relevant consequences may occur:
-  - The grammar may not be up-to-date.
-  - Some structures that are valid in the official grammar are not valid in this one, due to one of the following reasons: redundancy, and sanity
+- The grammar described in this repository is unofficial. Consequently, the following issues may arise:
+    - The grammar may not be up-to-date.
+    - Some structures that are valid in the official grammar may not be valid in this version due to factors such as redundancy or complexity.
 
-Still, we are trying out best to cover 99.(9)% of the existing code, providing a simple and efficient structure. The code is campable of parsing whole `circomlin` and `iden3-circuits`. 
+Despite this, we strive to cover 99.9% of the existing Circom code, offering a simple and efficient structure. The parser is capable of handling both `circomlib` and `iden3-circuits`.
 
 ## Contribution
 
-First of all you need to clone the repository
+To contribute, first clone the repository:
 
 ```shell
 git clone git@github.com:distributed-lab/circom-parser.git
 cd circom-parser
 ```
 
-And then you need to install dependencies
+Next, install the dependencies:
 
 ```shell
 go mod tidy
 ```
 
-After that, you can use following commands to sync gitmodules
+Then, synchronize the git submodules:
 
 ```shell
 git submodule update --init
 git submodule update --remote
 ```
 
-After initiating gitmodules you are ready to generate go binding for the grammar and test it (both of these action are in one command)
+After initializing the submodules, you are ready to generate the Go bindings for the grammar and run tests with a single command:
 
 ```shell
 make

@@ -34,6 +34,7 @@ functionStmt
     | ID SELF_OP ';'                                            #FuncSelfOp
     | varDeclaration ';'                                        #FuncVarDeclaration
     | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'    #FuncAssignmentExpression
+    | '(' argsWithUnderscore ')' ASSIGNMENT expression ';'      #FuncVariadicAssignment
     | 'if' parExpression functionStmt ('else' functionStmt)?    #IfFuncStmt
     | 'while' parExpression functionStmt                        #WhileFuncStmt
     | 'for' '(' forControl ')' functionStmt                     #ForFuncStmt
@@ -43,8 +44,7 @@ functionStmt
     ;
 
 templateDeclaration
-    : 'template' 'parallel'? ID '(' args? ')' templateBlock
-    | 'template' 'parallel'? 'custom' ID '(' args? ')' templateBlock
+    : 'template' 'custom'? 'parallel'? ID '(' args? ')' templateBlock
     ;
 
 templateBlock
@@ -52,7 +52,11 @@ templateBlock
     ;
 
 componentMainDeclaration
-    : 'component' 'main' ('{' 'public' '[' args ']'  '}')? '=' ID '(' expressionList? ')' ';'
+    : 'component' 'main' publicInputsList? '=' ID '(' expressionList? ')' ';'
+    ;
+
+publicInputsList
+    : '{' 'public' '[' args ']'  '}'
     ;
 
 templateStmt
@@ -68,7 +72,7 @@ templateStmt
     | expression RIGHT_ASSIGNMENT (identifier ('.' identifier)?) ';'
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
-    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) blockInstantiation ';'
+    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) (blockInstantiation | expression) ';'
     | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')' ';'
     | 'if' parExpression templateStmt ('else' templateStmt)?
     | 'while' parExpression templateStmt
@@ -117,14 +121,19 @@ componentDeclaration
     : componentDefinition arrayDimension* (ASSIGNMENT blockInstantiation)?
     ;
 
-signalDefinition: 'signal' SIGNAL_TYPE? ('{' args '}')? identifier;
+signalDefinition: 'signal' SIGNAL_TYPE? tagList? identifier;
+
+tagList: '{' args '}' ;
 
 signalDeclaration
     : signalDefinition (LEFT_ASSIGNMENT rhsValue)?
     | signalDefinition (',' identifier)*
     ;
 
-varDefinition: 'var' identifier ;
+varDefinition
+    : 'var' identifier
+    | 'var' '(' identifier (',' identifier)* ')'
+    ;
 
 varDeclaration
     : varDefinition (ASSIGNMENT rhsValue)?
@@ -139,16 +148,16 @@ componentCall
     | '(' expression RIGHT_ASSIGNMENT ID (',' expression RIGHT_ASSIGNMENT ID)* ')'
     ;
 
-blockInstantiation: ID '(' expressionList? ')' componentCall? ;
-
-arrayDimension: '[' (NUMBER | ID | expression) ']' ;
-
-argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
-
-args: ID (',' ID)* ;
-
-numSequence: NUMBER (',' NUMBER)* ;
+blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
 
 expressionList: expression (',' expression)* ;
 
 identifier: ID arrayDimension* ;
+
+arrayDimension: '[' expression ']' ;
+
+args: ID (',' ID)* ;
+
+argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
+
+numSequence: NUMBER (',' NUMBER)* ;

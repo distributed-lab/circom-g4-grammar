@@ -48,8 +48,7 @@ CUSTOM_TEMPLATES: 'custom_templates' ;
 
 MAIN: 'main' ;
 
-PARALLEL
-    : 'parallel' ;
+PARALLEL: 'parallel' ;
 
 LP: '(' ;
 RP: ')' ;
@@ -105,9 +104,11 @@ GE: '<=' ;
 AND: '&&' ;
 OR: '||' ;
 
-ID          :   LETTER (LETTER|DIGIT)*;
+ID          :   ID_SYMBOL* LETTER (LETTER|DIGIT|ID_SYMBOL)*;
 fragment
-LETTER      :   [a-zA-Z\u0080-\u00FF_$] ;
+LETTER      :   [a-zA-Z\u0080-\u00FF] ;
+fragment
+ID_SYMBOL   :   [_$] ;
 
 NUMBER: DIGIT+ | HEX;                                       // match integers
 fragment
