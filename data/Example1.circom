@@ -60,3 +60,5 @@ template nbits(a) {
 }
 
 component main {public [in1]}= A();
+
+// Some comment
