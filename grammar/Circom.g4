@@ -94,12 +94,12 @@ expression
    | blockInstantiation                                                               #BlockInstantiationExpression
    | expression '.' ID ('[' expression ']')?                                          #DotExpression
    | op=('~' | '!' | '-') expression                                                  #UnaryExpression
-   | expression '?' expression ':' expression                                         #TernaryExpression
    | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #BinaryExpression
    | expression op=('+' | '-') expression                                             #BinaryExpression
    | expression op=('<<' | '>>') expression                                           #BinaryExpression
    | expression op=('&' | '^' | '|') expression                                       #BinaryExpression
    | expression op=('==' | '!=' | '>' | '<' | '<=' | '>=' | '&&' | '||') expression   #BinaryExpression
+   | expression '?' expression ':' expression                                         #TernaryExpression
    ;
 
 primary
