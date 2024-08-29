@@ -59,8 +59,10 @@ RB: ']' ;
 LC: '{' ;
 RC: '}' ;
 
+COLON: ':' ;
 SEMICOLON: ';' ;
 
+DOT: '.' ;
 COMMA: ',' ;
 
 ASSIGNMENT: '=' ;
@@ -74,6 +76,10 @@ LEFT_ASSIGNMENT: '<--' | '<==' ;
 RIGHT_ASSIGNMENT: '-->' | '==>' ;
 
 CONSTRAINT_EQ: '===' ;
+
+QUESTION_MARK: '?' ;
+
+UNDERSCORE: '_' ;
 
 NOT: '!' ;
 BNOT: '~' ;
