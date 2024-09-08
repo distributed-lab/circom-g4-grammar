@@ -68,8 +68,10 @@ templateStmt
     | blockInstantiation ';'
     | (identifier ('.' ID)?) ASSIGNMENT expression ';'
     | expression CONSTRAINT_EQ expression ';'
-    | (primary | (identifier '.' identifier)) (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
-    | expression RIGHT_ASSIGNMENT (identifier ('.' identifier)?) ';'
+    | element (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
+    | '(' element (',' element)* ')' LEFT_ASSIGNMENT expression ';'
+    | expression RIGHT_ASSIGNMENT element ';'
+    | expression RIGHT_ASSIGNMENT '(' element (',' element)* ')' ';'
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
     | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) (blockInstantiation | expression) ';'
@@ -80,6 +82,8 @@ templateStmt
     | 'assert' parExpression ';'
     | logStmt ';'
     ;
+
+element: (identifier ('.' identifier)?) ;
 
 forControl: forInit ';' expression ';' forUpdate ;
 

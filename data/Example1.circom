@@ -57,6 +57,9 @@ template nbits(a) {
     i = out;
    }
    outA <== i;
+
+   component commitmentHash = Poseidon(2);
+   (commitmentHash.inputs[0], commitmentHash.inputs[1]) <== (nullifier, secret);
 }
 
 component main {public [in1]}= A();
