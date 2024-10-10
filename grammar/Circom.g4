@@ -116,7 +116,7 @@ primary
     ;
 
 logStmt
-    : 'log' '(' (STRING | expression)? ')'
+    : 'log' '(' ((STRING | expression) (',' (STRING | expression))*)? ')'
     ;
 
 componentDefinition: 'component' ID ;
@@ -156,7 +156,7 @@ blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
 
 expressionList: expression (',' expression)* ;
 
-identifier: ID arrayDimension* ;
+identifier: (ID | (ID '.' ID)) arrayDimension* ;
 
 arrayDimension: '[' expression ']' ;
 
