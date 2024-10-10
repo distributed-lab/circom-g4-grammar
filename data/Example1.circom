@@ -58,6 +58,18 @@ template nbits(a) {
    }
    outA <== i;
 
+   log("Number: ", 100);
+   log("Complicated expression: ", 1 + g[d - functionCall2(1)] * 3 + functionCall(1, 2, 3));
+
+   for(var i=0; i<2; i++)for(var idx=0; idx<CHUNK_NUMBER; idx++){
+        tmp[0][i][idx] <== add.out[i][idx] + addIsDouble * (doub.out[i][idx] - add.out[i][idx]);
+        // if a = O, then a + b = b
+        tmp[1][i][idx] <== tmp[0][i][idx] + aIsInfinity * (b[i][idx] - tmp[0][i][idx]);
+        // if b = O, then a + b = a
+        tmp[2][i][idx] <== tmp[1][i][idx] + bIsInfinity * (a[i][idx] - tmp[1][i][idx]);
+        out[i][idx] <== tmp[2][i][idx] + isInfinity * (a[i][idx] - tmp[2][i][idx]);
+   }
+
    component commitmentHash = Poseidon(2);
    (commitmentHash.inputs[0], commitmentHash.inputs[1]) <== (nullifier, secret);
 }
