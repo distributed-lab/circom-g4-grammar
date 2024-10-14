@@ -31,7 +31,7 @@ functionBlock
 
 functionStmt
     : functionBlock                                                                         #FuncBlock
-    | ID arrayDimension* SELF_OP ';'                                                                        #FuncSelfOp
+    | ID arrayDimension* SELF_OP ';'                                                        #FuncSelfOp
     | varDeclaration ';'                                                                    #FuncVarDeclaration
     | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'                                #FuncAssignmentExpression
     | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
