@@ -30,17 +30,17 @@ functionBlock
     ;
 
 functionStmt
-    : functionBlock                                             #FuncBlock
-    | ID SELF_OP ';'                                            #FuncSelfOp
-    | varDeclaration ';'                                        #FuncVarDeclaration
-    | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'    #FuncAssignmentExpression
-    | '(' argsWithUnderscore ')' ASSIGNMENT expression ';'      #FuncVariadicAssignment
-    | 'if' parExpression functionStmt ('else' functionStmt)?    #IfFuncStmt
-    | 'while' parExpression functionStmt                        #WhileFuncStmt
-    | 'for' '(' forControl ')' functionStmt                     #ForFuncStmt
-    | 'return' expression ';'                                   #ReturnFuncStmt
-    | 'assert' parExpression ';'                                #AssertFuncStmt
-    | logStmt ';'                                               #LogFuncStmt
+    : functionBlock                                                                         #FuncBlock
+    | ID SELF_OP ';'                                                                        #FuncSelfOp
+    | varDeclaration ';'                                                                    #FuncVarDeclaration
+    | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'                                #FuncAssignmentExpression
+    | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
+    | 'if' parExpression functionStmt ('else' functionStmt)?                                #IfFuncStmt
+    | 'while' parExpression functionStmt                                                    #WhileFuncStmt
+    | 'for' '(' forControl ')' functionStmt                                                 #ForFuncStmt
+    | 'return' expression ';'                                                               #ReturnFuncStmt
+    | 'assert' parExpression ';'                                                            #AssertFuncStmt
+    | logStmt ';'                                                                           #LogFuncStmt
     ;
 
 templateDeclaration
@@ -66,15 +66,15 @@ templateStmt
     | signalDeclaration ';'
     | componentDeclaration ';'
     | blockInstantiation ';'
-    | (identifier ('.' ID)?) ASSIGNMENT expression ';'
+    | identifier ASSIGNMENT expression ';'
     | expression CONSTRAINT_EQ expression ';'
     | element (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
-    | '(' element (',' element)* ')' LEFT_ASSIGNMENT expression ';'
+    | '(' element (',' element)* ')' LEFT_ASSIGNMENT '(' expression (',' expression)* ')' ';'
     | expression RIGHT_ASSIGNMENT element ';'
     | expression RIGHT_ASSIGNMENT '(' element (',' element)* ')' ';'
     | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
     | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
-    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) (blockInstantiation | expression) ';'
+    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) ('(' expressionList ')' | blockInstantiation | expression) ';'
     | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')' ';'
     | 'if' parExpression templateStmt ('else' templateStmt)?
     | 'while' parExpression templateStmt
@@ -144,7 +144,11 @@ varDeclaration
     | varDefinition (',' identifier)*
     ;
 
-rhsValue: expression | blockInstantiation ;
+rhsValue
+    : '(' expressionList ')'
+    | expression
+    | blockInstantiation
+    ;
 
 componentCall
     : '(' expressionList? ')'
@@ -156,7 +160,9 @@ blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
 
 expressionList: expression (',' expression)* ;
 
-identifier: (ID | (ID '.' ID)) arrayDimension* ;
+identifier
+    : ID  arrayDimension* ('.' ID)? arrayDimension*
+    ;
 
 arrayDimension: '[' expression ']' ;
 
