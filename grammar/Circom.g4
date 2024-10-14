@@ -31,7 +31,7 @@ functionBlock
 
 functionStmt
     : functionBlock                                                                         #FuncBlock
-    | ID SELF_OP ';'                                                                        #FuncSelfOp
+    | ID arrayDimension* SELF_OP ';'                                                                        #FuncSelfOp
     | varDeclaration ';'                                                                    #FuncVarDeclaration
     | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'                                #FuncAssignmentExpression
     | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
@@ -61,7 +61,7 @@ publicInputsList
 
 templateStmt
     : templateBlock
-    | ID SELF_OP ';'
+    | ID arrayDimension* SELF_OP ';'
     | varDeclaration ';'
     | signalDeclaration ';'
     | componentDeclaration ';'
@@ -161,7 +161,7 @@ blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
 expressionList: expression (',' expression)* ;
 
 identifier
-    : ID  arrayDimension* ('.' ID)? arrayDimension*
+    : ID arrayDimension* ('.' ID)? arrayDimension*
     ;
 
 arrayDimension: '[' expression ']' ;
