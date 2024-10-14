@@ -5,3 +5,4 @@ dist
 parser/*
 
 iden3-circuits
+test-data
