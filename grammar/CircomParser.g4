@@ -102,7 +102,7 @@ expression
    | expression op=('+' | '-') expression                                             #BinaryExpression
    | expression op=('<<' | '>>') expression                                           #BinaryExpression
    | expression op=('&' | '^' | '|') expression                                       #BinaryExpression
-   | expression op=('==' | '!=' | '>' | '<' | '<=' | '>=' | '&&' | '||') expression   #BinaryExpression
+   | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=' | '&&' | '||') expression   #BinaryExpression
    | expression '?' expression ':' expression                                         #TernaryExpression
    ;
 
