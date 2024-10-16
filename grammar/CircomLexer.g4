@@ -107,8 +107,8 @@ EQ: '==' ;
 NEQ: '!=' ;
 GT: '>' ;
 LT: '<' ;
-LE: '>=' ;
-GE: '<=' ;
+LE: '<=' ;
+GE: '>=' ;
 
 // left to right associativity
 AND: '&&' ;
