@@ -9,7 +9,7 @@ import (
 )
 
 type SimpleListener struct {
-	*bindings.BaseCircomListener
+	*bindings.BaseCircomParserListener
 	parser antlr.Parser
 }
 

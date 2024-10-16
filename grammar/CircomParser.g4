@@ -1,6 +1,6 @@
-grammar Circom;
+parser grammar CircomParser;
 
-import LexerCircom;
+options { tokenVocab=CircomLexer; }
 
 circuit
     :   pragmaDeclaration* includeDeclaration* blockDeclaration* componentMainDeclaration?
@@ -33,7 +33,7 @@ functionStmt
     : functionBlock                                                                         #FuncBlock
     | ID arrayDimension* SELF_OP ';'                                                        #FuncSelfOp
     | varDeclaration ';'                                                                    #FuncVarDeclaration
-    | identifier (ASSIGNMENT | ASSIGNMENT_OP) expression ';'                                #FuncAssignmentExpression
+    | identifier (ASSIGNMENT | ASSIGNMENT_WITH_OP) expression ';'                                #FuncAssignmentExpression
     | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
     | 'if' parExpression functionStmt ('else' functionStmt)?                                #IfFuncStmt
     | 'while' parExpression functionStmt                                                    #WhileFuncStmt
@@ -67,15 +67,15 @@ templateStmt
     | componentDeclaration ';'
     | blockInstantiation ';'
     | identifier ASSIGNMENT expression ';'
-    | expression CONSTRAINT_EQ expression ';'
-    | element (LEFT_ASSIGNMENT | ASSIGNMENT_OP) expression ';'
-    | '(' element (',' element)* ')' LEFT_ASSIGNMENT '(' expression (',' expression)* ')' ';'
-    | expression RIGHT_ASSIGNMENT element ';'
-    | expression RIGHT_ASSIGNMENT '(' element (',' element)* ')' ';'
-    | '_' (ASSIGNMENT | LEFT_ASSIGNMENT) (expression | blockInstantiation) ';'
-    | (expression | blockInstantiation) RIGHT_ASSIGNMENT '_' ';'
-    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_ASSIGNMENT) ('(' expressionList ')' | blockInstantiation | expression) ';'
-    | blockInstantiation RIGHT_ASSIGNMENT '(' argsWithUnderscore ')' ';'
+    | expression EQ_CONSTRAINT expression ';'
+    | element (LEFT_CONSTRAINT | ASSIGNMENT_WITH_OP) expression ';'
+    | '(' element (',' element)* ')' LEFT_CONSTRAINT '(' expression (',' expression)* ')' ';'
+    | expression RIGHT_CONSTRAINT element ';'
+    | expression RIGHT_CONSTRAINT '(' element (',' element)* ')' ';'
+    | '_' (ASSIGNMENT | LEFT_CONSTRAINT) (expression | blockInstantiation) ';'
+    | (expression | blockInstantiation) RIGHT_CONSTRAINT '_' ';'
+    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_CONSTRAINT) ('(' expressionList ')' | blockInstantiation | expression) ';'
+    | blockInstantiation RIGHT_CONSTRAINT '(' argsWithUnderscore ')' ';'
     | 'if' parExpression templateStmt ('else' templateStmt)?
     | 'while' parExpression templateStmt
     | 'for' '(' forControl ')' templateStmt
@@ -89,7 +89,7 @@ forControl: forInit ';' expression ';' forUpdate ;
 
 forInit: 'var'? identifier (ASSIGNMENT rhsValue)? ;
 
-forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_OP) expression)) | SELF_OP ID ;
+forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_WITH_OP) expression)) | SELF_OP ID ;
 
 parExpression: '(' expression ')' ;
 
@@ -130,7 +130,7 @@ signalDefinition: 'signal' SIGNAL_TYPE? tagList? identifier;
 tagList: '{' args '}' ;
 
 signalDeclaration
-    : signalDefinition (LEFT_ASSIGNMENT rhsValue)?
+    : signalDefinition (LEFT_CONSTRAINT rhsValue)?
     | signalDefinition (',' identifier)*
     ;
 
@@ -152,8 +152,8 @@ rhsValue
 
 componentCall
     : '(' expressionList? ')'
-    | '(' ID LEFT_ASSIGNMENT expression (',' ID LEFT_ASSIGNMENT expression)* ')'
-    | '(' expression RIGHT_ASSIGNMENT ID (',' expression RIGHT_ASSIGNMENT ID)* ')'
+    | '(' ID LEFT_CONSTRAINT expression (',' ID LEFT_CONSTRAINT expression)* ')'
+    | '(' expression RIGHT_CONSTRAINT ID (',' expression RIGHT_CONSTRAINT ID)* ')'
     ;
 
 blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
