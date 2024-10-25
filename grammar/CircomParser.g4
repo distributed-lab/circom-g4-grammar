@@ -33,9 +33,7 @@ pragmaDefinition
     | 'pragma' 'custom_templates' ';'   #PragmaCustomTemplates
     ;
 
-includeDefinition
-    : 'include' path=STRING ';'
-    ;
+includeDefinition: 'include' path=STRING ';' ;
 
 blockDefiniton
     : functionDefinition
@@ -43,25 +41,17 @@ blockDefiniton
     | busDefinition
     ;
 
-functionDefinition
-    : 'function' name=ID '(' argNames=simpleIdentifierList? ')' body
-    ;
+functionDefinition: 'function' name=ID '(' argNames=simpleIdentifierList? ')' body ;
 
 templateDefinition
     : 'template' customGate='custom'? 'parallel'? name=ID '(' argNames=simpleIdentifierList? ')' body
     ;
 
-busDefinition
-    : 'bus' name=ID '(' argNames=simpleIdentifierList? ')' body
-    ;
+busDefinition: 'bus' name=ID '(' argNames=simpleIdentifierList? ')' body ;
 
-publicInputsDefinition
-    : '{' 'public' '[' publicInputs=simpleIdentifierList ']' '}'
-    ;
+publicInputsDefinition: '{' 'public' '[' publicInputs=simpleIdentifierList ']' '}' ;
 
-tagDefinition
-    : '{' values=simpleIdentifierList '}'
-    ;
+tagDefinition: '{' values=simpleIdentifierList '}' ;
 
 logDefinition: 'log' '(' logArgs=expressionOrStringList? ')' ;
 
@@ -93,9 +83,7 @@ componentDeclaration
     | 'component' varIdentifierList
     ;
 
-busDeclaration
-    : busHeader signalIdentifierList
-    ;
+busDeclaration: busHeader signalIdentifierList ;
 
 componentMainDeclaration
     : 'component' 'main' publicInputsDefinition? '=' ID '(' argValues=expressionList? ')' ';'
@@ -105,7 +93,7 @@ componentMainDeclaration
                            STATEMENTS
 //////////////////////////////////////////////////////////////*/
 
-body: '{' stmts=statments* '}';
+body: '{' statments* '}';
 
 statments
     : declarations ';'
@@ -149,7 +137,8 @@ substitutions
 expressionList: (expression ',')* expression ;
 
 expressionListWithNames
-    : (name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression ',')* name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression
+    : (name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression ',')*
+       name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression
     ;
 
 expression
@@ -217,9 +206,7 @@ idetifierAccess
 
 arrayDimension: '[' expression ']' ;
 
-identifierReferance
-    : '.' ID
-    ;
+identifierReferance: '.' ID ;
 
 /*//////////////////////////////////////////////////////////////
                            PRIMITIVES
