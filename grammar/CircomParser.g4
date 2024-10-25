@@ -3,171 +3,375 @@ parser grammar CircomParser;
 options { tokenVocab=CircomLexer; }
 
 circuit
-    :   pragmaDeclaration* includeDeclaration* blockDeclaration* componentMainDeclaration?
+    :   pragmaDefinition* includeDefinition* blockDefiniton* componentMainDeclaration?
         EOF
     ;
 
-pragmaDeclaration
-    : 'pragma' 'circom' VERSION ';'
-    | 'pragma' 'custom_templates' ';'
+/*//////////////////////////////////////////////////////////////
+                            HEADERS
+//////////////////////////////////////////////////////////////*/
+
+signalHeader
+    : 'signal' SIGNAL_TYPE? tagDefinition?
+    | SIGNAL_TYPE 'signal' tagDefinition?
     ;
 
-includeDeclaration
-    : 'include' STRING ';'
+busHeader
+    : ID wireType=SIGNAL_TYPE? tagDefinition?
+    | ID '(' parameters=listable? ')' wireType=SIGNAL_TYPE? tagDefinition?
+    | wireType=SIGNAL_TYPE ID tagDefinition?
+    | wireType=SIGNAL_TYPE ID '(' parameters=listable? ')' tagDefinition?
     ;
 
-blockDeclaration
-    : functionDeclaration
-    | templateDeclaration
+/*//////////////////////////////////////////////////////////////
+                           DEFINITONS
+//////////////////////////////////////////////////////////////*/
+
+pragmaDefinition
+    : 'pragma' 'circom' VERSION ';'     #PragmaVersion
+    | 'pragma' 'circom' ';'             #PragmaInvalidVersion
+    | 'pragma' 'custom_templates' ';'   #PragmaCustomTemplates
     ;
 
-functionDeclaration
-    : 'function' ID '(' args? ')' functionBlock
+includeDefinition
+    : 'include' path=STRING ';'
     ;
 
-functionBlock
-    : '{' functionStmt* '}'
+blockDefiniton
+    : functionDefinition
+    | templateDefinition
+    | busDefinition
     ;
 
-functionStmt
-    : functionBlock                                                                         #FuncBlock
-    | ID arrayDimension* SELF_OP ';'                                                        #FuncSelfOp
-    | varDeclaration ';'                                                                    #FuncVarDeclaration
-    | identifier (ASSIGNMENT | ASSIGNMENT_WITH_OP) expression ';'                                #FuncAssignmentExpression
-    | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
-    | 'if' parExpression functionStmt ('else' functionStmt)?                                #IfFuncStmt
-    | 'while' parExpression functionStmt                                                    #WhileFuncStmt
-    | 'for' '(' forControl ')' functionStmt                                                 #ForFuncStmt
-    | 'return' expression ';'                                                               #ReturnFuncStmt
-    | 'assert' parExpression ';'                                                            #AssertFuncStmt
-    | logStmt ';'                                                                           #LogFuncStmt
+functionDefinition
+    : 'function' name=ID '(' argNames=simpleIdentifierList? ')' parseBlock
     ;
 
-templateDeclaration
-    : 'template' 'custom'? 'parallel'? ID '(' args? ')' templateBlock
+templateDefinition
+    : 'template' customGate='custom'? 'parallel'? name=ID '(' argNames=simpleIdentifierList? ')' parseBlock
     ;
 
-templateBlock
-    : '{' templateStmt* '}'
+busDefinition
+    : 'bus' name=ID '(' argNames=simpleIdentifierList? ')' parseBlock
+    ;
+
+publicInputsDefinition
+    : '{' 'public' '[' publicInputs=simpleIdentifierList ']' '}'
+    ;
+
+tagDefinition
+    : '{' values=simpleIdentifierList '}'
+    ;
+
+/*//////////////////////////////////////////////////////////////
+                          DECLARATIONS
+//////////////////////////////////////////////////////////////*/
+
+varDeclaration
+    : 'var' '(' identifierList ')' tupleInitiation?
+    | 'var' (varIdentifierAssignment ',')* varIdentifierAssignment
+    ;
+
+signalDeclaration
+    : signalHeader '(' identifierList ')' tupleInitiation?
+    | signalHeader (signalIdentifierAssignment ',')* signalIdentifierAssignment
+    ;
+
+componentDeclaration
+    : 'component' '(' identifierList ')' tupleInitiation?
+    | 'component' (varIdentifierAssignment ',')* varIdentifierAssignment
+    ;
+
+busDeclaration
+    : busHeader (signalIdentifierAssignment ',')* signalIdentifierAssignment
     ;
 
 componentMainDeclaration
-    : 'component' 'main' publicInputsList? '=' ID '(' expressionList? ')' ';'
+    : 'component' 'main' publicInputsDefinition? '=' ID '(' argValues=listable? ')' ';'
     ;
 
-publicInputsList
-    : '{' 'public' '[' args ']'  '}'
+
+parseDeclaration
+    : varDeclaration
+    | signalDeclaration
+    | componentDeclaration
+    | busDeclaration
     ;
 
-templateStmt
-    : templateBlock
-    | ID arrayDimension* SELF_OP ';'
-    | varDeclaration ';'
-    | signalDeclaration ';'
-    | componentDeclaration ';'
-    | blockInstantiation ';'
-    | identifier ASSIGNMENT expression ';'
-    | expression EQ_CONSTRAINT expression ';'
-    | element (LEFT_CONSTRAINT | ASSIGNMENT_WITH_OP) expression ';'
-    | '(' element (',' element)* ')' LEFT_CONSTRAINT '(' expression (',' expression)* ')' ';'
-    | expression RIGHT_CONSTRAINT element ';'
-    | expression RIGHT_CONSTRAINT '(' element (',' element)* ')' ';'
-    | '_' (ASSIGNMENT | LEFT_CONSTRAINT) (expression | blockInstantiation) ';'
-    | (expression | blockInstantiation) RIGHT_CONSTRAINT '_' ';'
-    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_CONSTRAINT) ('(' expressionList ')' | blockInstantiation | expression) ';'
-    | blockInstantiation RIGHT_CONSTRAINT '(' argsWithUnderscore ')' ';'
-    | 'if' parExpression templateStmt ('else' templateStmt)?
-    | 'while' parExpression templateStmt
-    | 'for' '(' forControl ')' templateStmt
-    | 'assert' parExpression ';'
-    | logStmt ';'
+/*//////////////////////////////////////////////////////////////
+                             BODIES
+//////////////////////////////////////////////////////////////*/
+
+//templateBody
+//    : '{' templateStmt* '}'
+//    ;
+//
+//busBody
+//    : '{' '}'
+//    ;
+//
+//functionBody
+//    : '{' functionStmt* '}'
+//    ;
+
+/*//////////////////////////////////////////////////////////////
+                           STATEMENTS
+//////////////////////////////////////////////////////////////*/
+
+parseSubstitution
+    : expression ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) rhe=expression
+    | lhe=expression '-->' variable=expression
+    | lhe=expression '==>' variable=expression
+    | identifierStatment ASSIGNMENT_WITH_OP rhe=expression
+    | identifierStatment SELF_OP
+    | SELF_OP identifierStatment
     ;
 
-element: (identifier ('.' identifier)?) ;
+parseBlock: '{' stmts=parseStatment3* '}';
 
-forControl: forInit ';' expression ';' forUpdate ;
+parseStatement: parseStatement0;
 
-forInit: 'var'? identifier (ASSIGNMENT rhsValue)? ;
+parseStatement0
+    : parseStmt0NB
+    | parseStatement1
+    ;
 
-forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_WITH_OP) expression)) | SELF_OP ID ;
+parseStmt0NB
+    : 'if' '(' cond=expression ')' parseStmt0NB
+    | 'if' '(' cond=expression ')' parseStatement1
+    | 'if' '(' cond=expression ')' parseStatement1 'else' elseCase=parseStmt0NB
+    ;
 
-parExpression: '(' expression ')' ;
+parseStatement1
+    : 'if' '(' cond=expression ')' ifCase=parseStatement1 'else' elseCase=parseStatement1
+    | parseStatement2
+    ;
+
+parseStatement2
+    : 'for' '(' init=parseDeclaration ';' cond=expression ';' step=parseSubstitution ')' body=parseStatement2
+    | 'for' '(' parseSubstitution ';' cond=expression ';' step=parseSubstitution ')' body=parseStatement2
+    | 'while' '(' cond=expression ')' stmt=parseStatement2
+    | 'return' value=expression ';'
+    | subs=parseSubstitution ';'
+    | lhe=expression '===' rhe=expression ';'
+    | parseStatementLog
+    | 'assert' '(' arg=expression ')' ';'
+    | lhe=expression ';'
+    | parseBlock
+    ;
+
+parseStatementLog
+    : 'log' '(' args=logListable? ')' ';'
+    ;
+
+parseStatment3
+    : parseDeclaration ';'
+    | parseStatement
+    ;
+
+
+//functionStmt
+//    : functionBody                                                                         #FuncBlockDeclaration
+//    | identifier SELF_OP ';'                                                                #FuncIncDecOperation
+//    | varDeclaration ';'                                                                    #FuncVarDeclaration
+//    | identifierStatment (ASSIGNMENT | ASSIGNMENT_WITH_OP) expression ';'                           #FuncAssignmentExpression
+//    | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
+//    | 'if' parExpression functionStmt ('else' functionStmt)?                                #IfFuncStmt
+//    | 'while' parExpression functionStmt                                                    #WhileFuncStmt
+//    | 'for' '(' forControl ')' functionStmt                                                 #ForFuncStmt
+//    | 'return' expression ';'                                                               #ReturnFuncStmt
+//    | 'assert' parExpression ';'                                                            #AssertFuncStmt
+//    | logStmt ';'                                                                           #LogFuncStmt
+//    ;
+//
+//templateStmt
+//    : templateBody
+//    | identifierStatment SELF_OP ';'
+//    | varDeclaration ';'
+//    | signalDeclaration ';'
+//    | componentDeclaration ';'
+//    | blockInstantiation ';'
+//    | identifierStatment ASSIGNMENT expression ';'
+//    | expression EQ_CONSTRAINT expression ';'
+//    | identifierStatment (LEFT_CONSTRAINT | ASSIGNMENT_WITH_OP) expression ';'
+//    | '(' identifierStatment (',' identifierStatment)* ')' LEFT_CONSTRAINT '(' expression (',' expression)* ')' ';'
+//    | expression RIGHT_CONSTRAINT identifierStatment ';'
+//    | expression RIGHT_CONSTRAINT '(' identifierStatment (',' identifierStatment)* ')' ';'
+//    | '_' (ASSIGNMENT | LEFT_CONSTRAINT) (expression | blockInstantiation) ';'
+//    | (expression | blockInstantiation) RIGHT_CONSTRAINT '_' ';'
+//    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_CONSTRAINT) ('(' expressionList ')' | blockInstantiation | expression) ';'
+//    | blockInstantiation RIGHT_CONSTRAINT '(' argsWithUnderscore ')' ';'
+//    | 'if' parExpression templateStmt ('else' templateStmt)?
+//    | 'while' parExpression templateStmt
+//    | 'for' '(' forControl ')' templateStmt
+//    | 'assert' parExpression ';'
+//    | logStmt ';'
+//    ;
+//
+//forControl: forInit ';' expression ';' forUpdate ;
+//
+//forInit
+//    : 'var'? ID (ASSIGNMENT rhsValue)?
+//    ;
+//
+//forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_WITH_OP) expression)) | SELF_OP ID ;
+//
+//parExpression: '(' expression ')' ;
+//
+//expression
+//   : primary                                                                          #ExpressionPrimary
+//   | blockInstantiation                                                               #ExpressionBlockInstantiation
+//   | op=('~' | '!' | '-') expression                                                  #ExpressionUnary
+//   | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #ExpressionBinary
+//   | expression op=('+' | '-') expression                                             #ExpressionBinary
+//   | expression op=('<<' | '>>') expression                                           #ExpressionBinary
+//   | expression op=('&' | '^' | '|') expression                                       #ExpressionBinary
+//   | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=' | '&&' | '||') expression   #ExpressionBinary
+//   | expression '?' expression ':' expression                                         #ExpressionTernary
+//   ;
+//
+//primary
+//    : '(' expression ')'
+//    | '[' expressionList ']'
+//    | NUMBER
+//    | identifierStatment
+//    | simpleIdentifierList
+//    | numSequence
+//    ;
+//
+//logStmt
+//    : 'log' '(' ((STRING | expression) (',' (STRING | expression))*)? ')'
+//    ;
+//
+//rhsValue
+//    : '(' expressionList ')'
+//    | expression
+//    | blockInstantiation
+//    ;
+//
+//componentCall
+//    : '(' expressionList? ')'
+//    | '(' ID LEFT_CONSTRAINT expression (',' ID LEFT_CONSTRAINT expression)* ')'
+//    | '(' expression RIGHT_CONSTRAINT ID (',' expression RIGHT_CONSTRAINT ID)* ')'
+//    ;
+//
+//blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
+//
+
+
+tupleInitiation
+    : '<==' rhs=expression
+    | '<--' rhs=expression
+    | '=' rhs=expression
+    ;
+
+/*//////////////////////////////////////////////////////////////
+                          EXPRESSIONS
+//////////////////////////////////////////////////////////////*/
+
+listable
+    : (expression ',')* expression
+    ;
+
+listableWithInputNames
+    : (name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression ',')* name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression
+    ;
+
+listableAnon
+    : listableWithInputNames
+    | listable
+    ;
+
+parseLogArgument
+    : expression
+    | STRING
+    ;
+
+logListable
+    : (parseLogArgument ',')* parseLogArgument
+    ;
 
 expression
-   : primary                                                                          #PrimaryExpression
-   | blockInstantiation                                                               #BlockInstantiationExpression
-   | expression '.' ID ('[' expression ']')?                                          #DotExpression
-   | op=('~' | '!' | '-') expression                                                  #UnaryExpression
-   | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #BinaryExpression
-   | expression op=('+' | '-') expression                                             #BinaryExpression
-   | expression op=('<<' | '>>') expression                                           #BinaryExpression
-   | expression op=('&' | '^' | '|') expression                                       #BinaryExpression
-   | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=' | '&&' | '||') expression   #BinaryExpression
-   | expression '?' expression ':' expression                                         #TernaryExpression
-   ;
+    : primary
+    | op=(NOT | BNOT | SUB) expression
+    | expression POW expression
+    | expression op=(MUL | DIV | QUO | MOD) expression
+    | expression op=(ADD | SUB) expression
+    | expression op=(SHL | SHR) expression
+    | expression BAND expression
+    | expression BXOR expression
+    | expression BOR expression
+    | expression op=(EQ | NEQ | LT | GT | LE | GE) expression
+    | expression AND expression
+    | expression OR expression
+    | cond=expression '?' if_true=expression ':' if_false=expression
+    | 'parallel' expression
+    ;
 
+// function call, array inline, anonymous component call
+// Literal, parentheses
 primary
-    : '(' expression ')'
-    | '[' expressionList ']'
+    : identifierStatment
+    | '_'
     | NUMBER
-    | identifier
-    | args
-    | numSequence
+    | ID '(' listable? ')' '(' listableAnon? ')'
+    | ID '(' listable? ')'
+    | '[' listable ']'
+    | '(' listable ')'
     ;
 
-logStmt
-    : 'log' '(' ((STRING | expression) (',' (STRING | expression))*)? ')'
+/*//////////////////////////////////////////////////////////////
+                           IDENTIFIER
+//////////////////////////////////////////////////////////////*/
+
+regularIdentifierAssignment
+    : identifier '=' rhs=expression
     ;
 
-componentDefinition: 'component' ID ;
-
-componentDeclaration
-    : componentDefinition arrayDimension* (ASSIGNMENT blockInstantiation)?
+constraintIdentifierAssignment
+    : identifier '<==' rhs=expression
     ;
 
-signalDefinition: 'signal' SIGNAL_TYPE? tagList? identifier;
-
-tagList: '{' args '}' ;
-
-signalDeclaration
-    : signalDefinition (LEFT_CONSTRAINT rhsValue)?
-    | signalDefinition (',' identifier)*
+simpleIdentifierAssignment
+    : identifier '<--' rhs=expression
     ;
 
-varDefinition
-    : 'var' identifier
-    | 'var' '(' identifier (',' identifier)* ')'
+varIdentifierAssignment
+    : identifier
+    | regularIdentifierAssignment
     ;
 
-varDeclaration
-    : varDefinition (ASSIGNMENT rhsValue)?
-    | varDefinition (',' identifier)*
+signalIdentifierAssignment
+    : identifier
+    | simpleIdentifierAssignment
+    | constraintIdentifierAssignment
     ;
 
-rhsValue
-    : '(' expressionList ')'
-    | expression
-    | blockInstantiation
+identifierStatment
+    : ID idetifierAccess*
     ;
-
-componentCall
-    : '(' expressionList? ')'
-    | '(' ID LEFT_CONSTRAINT expression (',' ID LEFT_CONSTRAINT expression)* ')'
-    | '(' expression RIGHT_CONSTRAINT ID (',' expression RIGHT_CONSTRAINT ID)* ')'
-    ;
-
-blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
-
-expressionList: expression (',' expression)* ;
 
 identifier
-    : ID arrayDimension* ('.' ID)? arrayDimension*
+    : ID arrayDimension*
     ;
 
-arrayDimension: '[' expression ']' ;
+identifierList
+    : (identifier ',')* identifier
+    ;
 
-args: ID (',' ID)* ;
+simpleIdentifierList
+    : (ID ',')* ID
+    ;
 
-argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
+idetifierAccess
+    : arrayDimension
+    | identifierReferance
+    ;
 
-numSequence: NUMBER (',' NUMBER)* ;
+arrayDimension
+    : '[' expression ']'
+    ;
+
+identifierReferance
+    : '.' ID
+    ;
