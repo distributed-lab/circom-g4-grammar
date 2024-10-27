@@ -33,7 +33,7 @@ pragmaDefinition
     | 'pragma' 'custom_templates' ';'   #PragmaCustomTemplates
     ;
 
-includeDefinition: 'include' path=STRING ';' ;
+includeDefinition: 'include' STRING ';' ;
 
 blockDefiniton
     : functionDefinition
@@ -41,13 +41,13 @@ blockDefiniton
     | busDefinition
     ;
 
-functionDefinition: 'function' name=ID '(' argNames=simpleIdentifierList? ')' body ;
+functionDefinition: 'function' ID '(' argNames=simpleIdentifierList? ')' body ;
 
 templateDefinition
-    : 'template' customGate='custom'? 'parallel'? name=ID '(' argNames=simpleIdentifierList? ')' body
+    : 'template' 'custom'? 'parallel'? ID '(' argNames=simpleIdentifierList? ')' body
     ;
 
-busDefinition: 'bus' name=ID '(' argNames=simpleIdentifierList? ')' body ;
+busDefinition: 'bus' ID '(' argNames=simpleIdentifierList? ')' body ;
 
 publicInputsDefinition: '{' 'public' '[' publicInputs=simpleIdentifierList ']' '}' ;
 
@@ -93,24 +93,24 @@ componentMainDeclaration
                            STATEMENTS
 //////////////////////////////////////////////////////////////*/
 
-body: '{' statments* '}';
+body: '{' statements* '}';
 
-statments
+statements
     : declarations ';'
     | ifStatments
-    | regularStatmetns
+    | regularStatements
     | logDefinition ';'
     | assertDefinition ';'
     ;
 
 ifStatments
     : 'if' '(' cond=expression ')' ifStatments                                  #IfWithFollowUpIf
-    | 'if' '(' cond=expression ')' regularStatmetns                             #IfRegular
-    | 'if' '(' cond=expression ')' regularStatmetns 'else' ifStatments          #IfRegularElseWithFollowUpIf
-    | 'if' '(' cond=expression ')' regularStatmetns 'else' regularStatmetns     #IfRegularElseRegular
+    | 'if' '(' cond=expression ')' regularStatements                             #IfRegular
+    | 'if' '(' cond=expression ')' regularStatements 'else' ifStatments          #IfRegularElseWithFollowUpIf
+    | 'if' '(' cond=expression ')' regularStatements 'else' regularStatements     #IfRegularElseRegular
     ;
 
-regularStatmetns
+regularStatements
     : body                                             #RStatmentBody
     | expression ';'                                   #RStatmentExpression
     | substitutions ';'                                #RStatmentSucstitutions
@@ -120,9 +120,9 @@ regularStatmetns
     ;
 
 cycleStatments
-    : 'for' '(' declarations ';' cond=expression ';' step=substitutions ')' forBody=regularStatmetns    #CycleForWithDeclaration
-    | 'for' '(' substitutions ';' cond=expression ';' step=substitutions ')' forBody=regularStatmetns   #CycleForWithoutDeclaration
-    | 'while' '(' cond=expression ')' stmt=regularStatmetns                                             #CycleWhile
+    : 'for' '(' declarations ';' cond=expression ';' step=substitutions ')' forBody=regularStatements    #CycleForWithDeclaration
+    | 'for' '(' substitutions ';' cond=expression ';' step=substitutions ')' forBody=regularStatements   #CycleForWithoutDeclaration
+    | 'while' '(' cond=expression ')' stmt=regularStatements                                             #CycleWhile
     ;
 
 substitutions
@@ -141,8 +141,8 @@ substitutions
 expressionList: (expression ',')* expression ;
 
 expressionListWithNames
-    : (name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression ',')*
-       name=ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression
+    : (ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression ',')*
+       ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression
     ;
 
 expression
