@@ -131,7 +131,7 @@ substitutions
     | lhs=expression op='==>' variable=expression                                           #SubsRightConstrAssignmet
     | identifierStatment op=ASSIGNMENT_WITH_OP rhs=expression                               #SubsAssignmetWithOperation
     | identifierStatment SELF_OP                                                            #SubsIcnDecOperation
-    | SELF_OP identifierStatment                                                            #SubsInvalidOperation
+    | SELF_OP identifierStatment                                                            #SubsInvalidIcnDecOperation
     ;
 
 /*//////////////////////////////////////////////////////////////
