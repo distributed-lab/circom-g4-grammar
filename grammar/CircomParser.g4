@@ -97,29 +97,29 @@ body: '{' statements* '}';
 
 statements
     : declarations ';'
-    | ifStatments
+    | ifStatements
     | regularStatements
     | logDefinition ';'
     | assertDefinition ';'
     ;
 
-ifStatments
-    : 'if' '(' cond=expression ')' ifStatments                                  #IfWithFollowUpIf
+ifStatements
+    : 'if' '(' cond=expression ')' ifStatements                                  #IfWithFollowUpIf
     | 'if' '(' cond=expression ')' regularStatements                             #IfRegular
-    | 'if' '(' cond=expression ')' regularStatements 'else' ifStatments          #IfRegularElseWithFollowUpIf
+    | 'if' '(' cond=expression ')' regularStatements 'else' ifStatements          #IfRegularElseWithFollowUpIf
     | 'if' '(' cond=expression ')' regularStatements 'else' regularStatements     #IfRegularElseRegular
     ;
 
 regularStatements
-    : body                                             #RStatmentBody
-    | expression ';'                                   #RStatmentExpression
-    | substitutions ';'                                #RStatmentSucstitutions
-    | cycleStatments                                   #RStatmentCycles
-    | lhs=expression '===' rhs=expression ';'          #RStatmentEqConstraint
-    | 'return' value=expression ';'                    #RStatmentReturn
+    : body                                             #RStatementBody
+    | expression ';'                                   #RStatementExpression
+    | substitutions ';'                                #RStatementSucstitutions
+    | cycleStatements                                  #RStatementCycles
+    | lhs=expression '===' rhs=expression ';'          #RStatementEqConstraint
+    | 'return' value=expression ';'                    #RStatementReturn
     ;
 
-cycleStatments
+cycleStatements
     : 'for' '(' declarations ';' cond=expression ';' step=substitutions ')' forBody=regularStatements    #CycleForWithDeclaration
     | 'for' '(' substitutions ';' cond=expression ';' step=substitutions ')' forBody=regularStatements   #CycleForWithoutDeclaration
     | 'while' '(' cond=expression ')' stmt=regularStatements                                             #CycleWhile
@@ -129,9 +129,9 @@ substitutions
     : lhs=expression op=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) rhs=expression     #SubsLeftAssignmet
     | lhs=expression op='-->' variable=expression                                           #SubsRightSimpleAssignmet
     | lhs=expression op='==>' variable=expression                                           #SubsRightConstrAssignmet
-    | identifierStatment op=ASSIGNMENT_WITH_OP rhs=expression                               #SubsAssignmetWithOperation
-    | identifierStatment SELF_OP                                                            #SubsIcnDecOperation
-    | SELF_OP identifierStatment                                                            #SubsInvalidIcnDecOperation
+    | identifierStatement op=ASSIGNMENT_WITH_OP rhs=expression                               #SubsAssignmetWithOperation
+    | identifierStatement SELF_OP                                                            #SubsIcnDecOperation
+    | SELF_OP identifierStatement                                                            #SubsInvalidIcnDecOperation
     ;
 
 /*//////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ expression
 
 // Literal, parentheses, function call, array inline, anonymous component call
 primaryExpression
-    : identifierStatment                                                                #PIdentifierStatment
+    : identifierStatement                                                                #PIdentifierStatement
     | '_'                                                                               #PUnderscore
     | NUMBER                                                                            #PNumber
     | '(' expressionList ')'                                                            #PParentheses
@@ -195,7 +195,7 @@ signalIdentifier
 
 signalIdentifierList: (signalIdentifier ',')* signalIdentifier ;
 
-identifierStatment: ID idetifierAccess* ;
+identifierStatement: ID idetifierAccess* ;
 
 identifier: ID arrayDimension* ;
 
