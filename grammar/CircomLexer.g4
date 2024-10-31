@@ -1,7 +1,7 @@
 lexer grammar CircomLexer;
 
 /*//////////////////////////////////////////////////////////////
-                       COMMON STRUCTURES
+                COMMON STRUCTURES AND TERMINALS
 //////////////////////////////////////////////////////////////*/
 
 VERSION: NUMBER '.' NUMBER '.' NUMBER ;
@@ -22,6 +22,7 @@ INCLUDE: 'include' ;
 CUSTOM: 'custom' ;
 PARALLEL: 'parallel' ;
 
+BUS: 'bus' ;
 TEMPLATE: 'template' ;
 FUNCTION: 'function' ;
 
@@ -75,8 +76,12 @@ TERNARY_CONDITION: '?' ;
 TERNARY_ALTERNATIVE: ':' ;
 
 EQ_CONSTRAINT: '===' ;
-LEFT_CONSTRAINT: '<--' | '<==' ;
-RIGHT_CONSTRAINT: '-->' | '==>' ;
+
+LEFT_CONSTRAINT: '<==' ;
+LEFT_ASSIGNMENT: '<--' ;
+
+RIGHT_CONSTRAINT: '==>' ;
+RIGHT_ASSIGNMENT: '-->' ;
 
 // Unary operators
 SELF_OP: '++' | '--' ;
@@ -118,9 +123,9 @@ OR: '||' ;
 ASSIGNMENT: '=' ;
 ASSIGNMENT_WITH_OP: '+=' | '-=' | '*=' | '**=' | '/=' | '\\=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' ;
 
-ID          :   ID_SYMBOL* LETTER (LETTER|DIGIT|ID_SYMBOL)*;
+ID          :   ID_SYMBOL* LETTER (LETTER|ID_SYMBOL|DIGIT)* ; // r"[$_]*[a-zA-Z][a-zA-Z$_0-9]*"
 fragment
-LETTER      :   [a-zA-Z\u0080-\u00FF] ;
+LETTER      :   [a-zA-Z] ;
 fragment
 ID_SYMBOL   :   [_$] ;
 
@@ -128,7 +133,7 @@ NUMBER: DIGIT+ | HEX;
 fragment
 DIGIT: [0-9] ;
 
-HEX :   '0' 'x' HEXDIGIT+ ;
+HEX :   '0' 'x' HEXDIGIT+ ; // 0x[0-9A-Fa-f]*
 fragment
 HEXDIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
 

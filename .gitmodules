@@ -7,3 +7,9 @@
 [submodule "passport-zk-circuits"]
 	path = passport-zk-circuits
 	url = git@github.com:rarimo/passport-zk-circuits.git
+[submodule "ed25519-circom"]
+	path = ed25519-circom
+	url = git@github.com:Electron-Labs/ed25519-circom.git
+[submodule "maci"]
+	path = maci
+	url = git@github.com:privacy-scaling-explorations/maci.git

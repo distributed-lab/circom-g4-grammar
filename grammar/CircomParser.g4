@@ -3,171 +3,219 @@ parser grammar CircomParser;
 options { tokenVocab=CircomLexer; }
 
 circuit
-    :   pragmaDeclaration* includeDeclaration* blockDeclaration* componentMainDeclaration?
+    :   pragmaDefinition* includeDefinition* blockDefiniton* componentMainDeclaration?
         EOF
     ;
 
-pragmaDeclaration
-    : 'pragma' 'circom' VERSION ';'
-    | 'pragma' 'custom_templates' ';'
+/*//////////////////////////////////////////////////////////////
+                            HEADERS
+//////////////////////////////////////////////////////////////*/
+
+signalHeader
+    : 'signal' SIGNAL_TYPE? tagDefinition?
+    | SIGNAL_TYPE 'signal' tagDefinition?
     ;
 
-includeDeclaration
-    : 'include' STRING ';'
+busHeader
+    : ID wireType=SIGNAL_TYPE? tagDefinition?
+    | ID '(' parameters=expressionList? ')' wireType=SIGNAL_TYPE? tagDefinition?
+    | wireType=SIGNAL_TYPE ID tagDefinition?
+    | wireType=SIGNAL_TYPE ID '(' parameters=expressionList? ')' tagDefinition?
     ;
 
-blockDeclaration
-    : functionDeclaration
-    | templateDeclaration
+/*//////////////////////////////////////////////////////////////
+                           DEFINITONS
+//////////////////////////////////////////////////////////////*/
+
+pragmaDefinition
+    : 'pragma' 'circom' VERSION ';'     #PragmaVersion
+    | 'pragma' 'circom' ';'             #PragmaInvalidVersion
+    | 'pragma' 'custom_templates' ';'   #PragmaCustomTemplates
     ;
 
-functionDeclaration
-    : 'function' ID '(' args? ')' functionBlock
+includeDefinition: 'include' STRING ';' ;
+
+blockDefiniton
+    : functionDefinition
+    | templateDefinition
+    | busDefinition
     ;
 
-functionBlock
-    : '{' functionStmt* '}'
+functionDefinition: 'function' ID '(' argNames=simpleIdentifierList? ')' body ;
+
+templateDefinition
+    : 'template' 'custom'? 'parallel'? ID '(' argNames=simpleIdentifierList? ')' body
     ;
 
-functionStmt
-    : functionBlock                                                                         #FuncBlock
-    | ID arrayDimension* SELF_OP ';'                                                        #FuncSelfOp
-    | varDeclaration ';'                                                                    #FuncVarDeclaration
-    | identifier (ASSIGNMENT | ASSIGNMENT_WITH_OP) expression ';'                                #FuncAssignmentExpression
-    | '(' argsWithUnderscore ')' ASSIGNMENT ('(' expressionList ')' | expression) ';'       #FuncVariadicAssignment
-    | 'if' parExpression functionStmt ('else' functionStmt)?                                #IfFuncStmt
-    | 'while' parExpression functionStmt                                                    #WhileFuncStmt
-    | 'for' '(' forControl ')' functionStmt                                                 #ForFuncStmt
-    | 'return' expression ';'                                                               #ReturnFuncStmt
-    | 'assert' parExpression ';'                                                            #AssertFuncStmt
-    | logStmt ';'                                                                           #LogFuncStmt
-    ;
+busDefinition: 'bus' ID '(' argNames=simpleIdentifierList? ')' body ;
 
-templateDeclaration
-    : 'template' 'custom'? 'parallel'? ID '(' args? ')' templateBlock
-    ;
+publicInputsDefinition: '{' 'public' '[' publicInputs=simpleIdentifierList ']' '}' ;
 
-templateBlock
-    : '{' templateStmt* '}'
-    ;
+tagDefinition: '{' values=simpleIdentifierList '}' ;
 
-componentMainDeclaration
-    : 'component' 'main' publicInputsList? '=' ID '(' expressionList? ')' ';'
-    ;
+logDefinition: 'log' '(' logArgs=expressionOrStringList? ')' ;
 
-publicInputsList
-    : '{' 'public' '[' args ']'  '}'
-    ;
+assertDefinition: 'assert' '(' assertArgs=expression ')' ;
 
-templateStmt
-    : templateBlock
-    | ID arrayDimension* SELF_OP ';'
-    | varDeclaration ';'
-    | signalDeclaration ';'
-    | componentDeclaration ';'
-    | blockInstantiation ';'
-    | identifier ASSIGNMENT expression ';'
-    | expression EQ_CONSTRAINT expression ';'
-    | element (LEFT_CONSTRAINT | ASSIGNMENT_WITH_OP) expression ';'
-    | '(' element (',' element)* ')' LEFT_CONSTRAINT '(' expression (',' expression)* ')' ';'
-    | expression RIGHT_CONSTRAINT element ';'
-    | expression RIGHT_CONSTRAINT '(' element (',' element)* ')' ';'
-    | '_' (ASSIGNMENT | LEFT_CONSTRAINT) (expression | blockInstantiation) ';'
-    | (expression | blockInstantiation) RIGHT_CONSTRAINT '_' ';'
-    | '(' argsWithUnderscore ')' (ASSIGNMENT | LEFT_CONSTRAINT) ('(' expressionList ')' | blockInstantiation | expression) ';'
-    | blockInstantiation RIGHT_CONSTRAINT '(' argsWithUnderscore ')' ';'
-    | 'if' parExpression templateStmt ('else' templateStmt)?
-    | 'while' parExpression templateStmt
-    | 'for' '(' forControl ')' templateStmt
-    | 'assert' parExpression ';'
-    | logStmt ';'
-    ;
+/*//////////////////////////////////////////////////////////////
+                          DECLARATIONS
+//////////////////////////////////////////////////////////////*/
 
-element: (identifier ('.' identifier)?) ;
-
-forControl: forInit ';' expression ';' forUpdate ;
-
-forInit: 'var'? identifier (ASSIGNMENT rhsValue)? ;
-
-forUpdate: ID (SELF_OP | ((ASSIGNMENT | ASSIGNMENT_WITH_OP) expression)) | SELF_OP ID ;
-
-parExpression: '(' expression ')' ;
-
-expression
-   : primary                                                                          #PrimaryExpression
-   | blockInstantiation                                                               #BlockInstantiationExpression
-   | expression '.' ID ('[' expression ']')?                                          #DotExpression
-   | op=('~' | '!' | '-') expression                                                  #UnaryExpression
-   | expression op=('**' | '*' | '/' | '\\' | '%') expression                         #BinaryExpression
-   | expression op=('+' | '-') expression                                             #BinaryExpression
-   | expression op=('<<' | '>>') expression                                           #BinaryExpression
-   | expression op=('&' | '^' | '|') expression                                       #BinaryExpression
-   | expression op=('==' | '!=' | '>' | '<' | '>=' | '<=' | '&&' | '||') expression   #BinaryExpression
-   | expression '?' expression ':' expression                                         #TernaryExpression
-   ;
-
-primary
-    : '(' expression ')'
-    | '[' expressionList ']'
-    | NUMBER
-    | identifier
-    | args
-    | numSequence
-    ;
-
-logStmt
-    : 'log' '(' ((STRING | expression) (',' (STRING | expression))*)? ')'
-    ;
-
-componentDefinition: 'component' ID ;
-
-componentDeclaration
-    : componentDefinition arrayDimension* (ASSIGNMENT blockInstantiation)?
-    ;
-
-signalDefinition: 'signal' SIGNAL_TYPE? tagList? identifier;
-
-tagList: '{' args '}' ;
-
-signalDeclaration
-    : signalDefinition (LEFT_CONSTRAINT rhsValue)?
-    | signalDefinition (',' identifier)*
-    ;
-
-varDefinition
-    : 'var' identifier
-    | 'var' '(' identifier (',' identifier)* ')'
+declarations
+    : varDeclaration
+    | signalDeclaration
+    | componentDeclaration
+    | busDeclaration
     ;
 
 varDeclaration
-    : varDefinition (ASSIGNMENT rhsValue)?
-    | varDefinition (',' identifier)*
+    : 'var' '(' identifierList ')' assignmentExpression?
+    | 'var' varIdentifierList
     ;
 
-rhsValue
-    : '(' expressionList ')'
-    | expression
-    | blockInstantiation
+signalDeclaration
+    : signalHeader '(' identifierList ')' assignmentExpression?
+    | signalHeader signalIdentifierList
     ;
 
-componentCall
-    : '(' expressionList? ')'
-    | '(' ID LEFT_CONSTRAINT expression (',' ID LEFT_CONSTRAINT expression)* ')'
-    | '(' expression RIGHT_CONSTRAINT ID (',' expression RIGHT_CONSTRAINT ID)* ')'
+componentDeclaration
+    : 'component' '(' identifierList ')' assignmentExpression?
+    | 'component' varIdentifierList
     ;
 
-blockInstantiation: 'parallel'? ID '(' expressionList? ')' componentCall? ;
+busDeclaration: busHeader signalIdentifierList ;
 
-expressionList: expression (',' expression)* ;
+componentMainDeclaration
+    : 'component' 'main' publicInputsDefinition? '=' ID '(' argValues=expressionList? ')' ';'
+    ;
 
-identifier
-    : ID arrayDimension* ('.' ID)? arrayDimension*
+/*//////////////////////////////////////////////////////////////
+                           STATEMENTS
+//////////////////////////////////////////////////////////////*/
+
+body: '{' statements* '}';
+
+statements
+    : declarations ';'
+    | ifStatements
+    | regularStatements
+    | logDefinition ';'
+    | assertDefinition ';'
+    ;
+
+ifStatements
+    : 'if' '(' cond=expression ')' ifStatements                                   #IfWithFollowUpIf
+    | 'if' '(' cond=expression ')' regularStatements                              #IfRegular
+    | 'if' '(' cond=expression ')' regularStatements 'else' ifStatements          #IfRegularElseWithFollowUpIf
+    | 'if' '(' cond=expression ')' regularStatements 'else' regularStatements     #IfRegularElseRegular
+    ;
+
+regularStatements
+    : body                                             #RStatementBody
+    | expression ';'                                   #RStatementExpression
+    | substitutions ';'                                #RStatementSucstitutions
+    | cycleStatements                                  #RStatementCycles
+    | lhs=expression '===' rhs=expression ';'          #RStatementEqConstraint
+    | 'return' value=expression ';'                    #RStatementReturn
+    ;
+
+cycleStatements
+    : 'for' '(' declarations ';' cond=expression ';' step=substitutions ')' forBody=regularStatements    #CycleForWithDeclaration
+    | 'for' '(' substitutions ';' cond=expression ';' step=substitutions ')' forBody=regularStatements   #CycleForWithoutDeclaration
+    | 'while' '(' cond=expression ')' stmt=regularStatements                                             #CycleWhile
+    ;
+
+substitutions
+    : lhs=expression op=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) rhs=expression      #SubsLeftAssignment
+    | lhs=expression op='-->' variable=expression                                            #SubsRightSimpleAssignment
+    | lhs=expression op='==>' variable=expression                                            #SubsRightConstrAssignment
+    | identifierStatement op=ASSIGNMENT_WITH_OP rhs=expression                               #SubsAssignmentWithOperation
+    | identifierStatement SELF_OP                                                            #SubsIcnDecOperation
+    | SELF_OP identifierStatement                                                            #SubsInvalidIcnDecOperation
+    ;
+
+/*//////////////////////////////////////////////////////////////
+                          EXPRESSIONS
+//////////////////////////////////////////////////////////////*/
+
+expressionList: (expression ',')* expression ;
+
+expressionListWithNames
+    : (ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression ',')*
+       ID ops=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) expression
+    ;
+
+expression
+    : primaryExpression
+    | op=(NOT | BNOT | SUB) expression
+    | expression op=POW expression
+    | expression op=(MUL | DIV | QUO | MOD) expression
+    | expression op=(ADD | SUB) expression
+    | expression op=(SHL | SHR) expression
+    | expression op=BAND expression
+    | expression op=BXOR expression
+    | expression op=BOR expression
+    | expression op=(EQ | NEQ | LT | GT | LE | GE) expression
+    | expression op=AND expression
+    | expression op=OR expression
+    | cond=expression '?' ifTrue=expression ':' ifFalse=expression
+    | 'parallel' expression
+    ;
+
+// Literal, parentheses, function call, array inline, anonymous component call
+primaryExpression
+    : identifierStatement                                                               #PIdentifierStatement
+    | '_'                                                                               #PUnderscore
+    | NUMBER                                                                            #PNumber
+    | '(' expressionList ')'                                                            #PParentheses
+    | '[' expressionList ']'                                                            #PArray
+    | ID '(' expressionList? ')'                                                        #PCall
+    | ID '(' expressionList? ')' '(' (expressionList | expressionListWithNames)? ')'    #PAnonymousCall
+    ;
+
+assignmentExpression
+    : '<==' rhs=expression      #AssignExprConstraint
+    | '<--' rhs=expression      #AssignExprSimple
+    | '=' rhs=expression        #AssignExprRegular
+    ;
+
+/*//////////////////////////////////////////////////////////////
+                           IDENTIFIER
+//////////////////////////////////////////////////////////////*/
+
+varIdentifier: identifier ('=' rhs=expression)? ;
+
+varIdentifierList: (varIdentifier ',')* varIdentifier ;
+
+signalIdentifier
+    : identifier
+    | identifier '<--' rhs=expression
+    | identifier '<==' rhs=expression
+    ;
+
+signalIdentifierList: (signalIdentifier ',')* signalIdentifier ;
+
+identifierStatement: ID idetifierAccess* ;
+
+identifier: ID arrayDimension* ;
+
+identifierList: (identifier ',')* identifier ;
+
+simpleIdentifierList: (ID ',')* ID ;
+
+idetifierAccess
+    : arrayDimension
+    | identifierReferance
     ;
 
 arrayDimension: '[' expression ']' ;
 
-args: ID (',' ID)* ;
+identifierReferance: '.' ID ;
 
-argsWithUnderscore: ('_' | ID) (',' ('_' | ID) )* ;
+/*//////////////////////////////////////////////////////////////
+                           PRIMITIVES
+//////////////////////////////////////////////////////////////*/
 
-numSequence: NUMBER (',' NUMBER)* ;
+expressionOrString: expression | STRING ;
+
+expressionOrStringList: (expressionOrString ',')* expressionOrString ;

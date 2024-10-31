@@ -9,7 +9,14 @@ import (
 
 // TestParseAllCircuits recursively parses all circuit files in the directory
 func TestParseAllCircuits(t *testing.T) {
-	baseDirs := []string{"iden3-circuits/circuits", "circomlib/circuits", "data", "passport-zk-circuits/circuits"}
+	baseDirs := []string{
+		"iden3-circuits/circuits",
+		"circomlib/circuits",
+		"data",
+		"passport-zk-circuits/circuits",
+		"ed25519-circom/circuits",
+		"maci/packages/circuits/circom",
+	}
 
 	for _, baseDir := range baseDirs {
 		err := filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {

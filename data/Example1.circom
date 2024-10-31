@@ -20,7 +20,16 @@ function nbits(a) {
 
 template A(a, b, c) {}
 
+function TestFunc() {
+    return [[1, 2, 3]];
+}
+
 template nbits(a) {
+    var i = 0;
+    for (kek.out[0] <-- 9; kek.out[0] < 10; i++) {}
+    for (9 --> kek.out[1]; kek.out[0] < 10; i++) {}
+    for (var some[1] = [0]; kek.out[0] < 10; i++) {}
+
     var o_u_t;
     var o$o;
     var x[3] = [2,8,4];
