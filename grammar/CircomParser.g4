@@ -104,8 +104,8 @@ statements
     ;
 
 ifStatements
-    : 'if' '(' cond=expression ')' ifStatements                                  #IfWithFollowUpIf
-    | 'if' '(' cond=expression ')' regularStatements                             #IfRegular
+    : 'if' '(' cond=expression ')' ifStatements                                   #IfWithFollowUpIf
+    | 'if' '(' cond=expression ')' regularStatements                              #IfRegular
     | 'if' '(' cond=expression ')' regularStatements 'else' ifStatements          #IfRegularElseWithFollowUpIf
     | 'if' '(' cond=expression ')' regularStatements 'else' regularStatements     #IfRegularElseRegular
     ;
@@ -126,10 +126,10 @@ cycleStatements
     ;
 
 substitutions
-    : lhs=expression op=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) rhs=expression     #SubsLeftAssignmet
-    | lhs=expression op='-->' variable=expression                                           #SubsRightSimpleAssignmet
-    | lhs=expression op='==>' variable=expression                                           #SubsRightConstrAssignmet
-    | identifierStatement op=ASSIGNMENT_WITH_OP rhs=expression                               #SubsAssignmetWithOperation
+    : lhs=expression op=(ASSIGNMENT | LEFT_ASSIGNMENT | LEFT_CONSTRAINT) rhs=expression      #SubsLeftAssignment
+    | lhs=expression op='-->' variable=expression                                            #SubsRightSimpleAssignment
+    | lhs=expression op='==>' variable=expression                                            #SubsRightConstrAssignment
+    | identifierStatement op=ASSIGNMENT_WITH_OP rhs=expression                               #SubsAssignmentWithOperation
     | identifierStatement SELF_OP                                                            #SubsIcnDecOperation
     | SELF_OP identifierStatement                                                            #SubsInvalidIcnDecOperation
     ;
@@ -164,7 +164,7 @@ expression
 
 // Literal, parentheses, function call, array inline, anonymous component call
 primaryExpression
-    : identifierStatement                                                                #PIdentifierStatement
+    : identifierStatement                                                               #PIdentifierStatement
     | '_'                                                                               #PUnderscore
     | NUMBER                                                                            #PNumber
     | '(' expressionList ')'                                                            #PParentheses
