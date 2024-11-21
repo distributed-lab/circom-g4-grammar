@@ -1,4 +1,4 @@
-bus B1(){
+bus B1 {
     signal x;
 }
 

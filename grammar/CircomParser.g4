@@ -44,10 +44,10 @@ blockDefiniton
 functionDefinition: 'function' ID '(' argNames=simpleIdentifierList? ')' body ;
 
 templateDefinition
-    : 'template' 'custom'? 'parallel'? ID '(' argNames=simpleIdentifierList? ')' body
+    : 'template' 'custom'? 'parallel'? ID ('(' argNames=simpleIdentifierList? ')')? body
     ;
 
-busDefinition: 'bus' ID '(' argNames=simpleIdentifierList? ')' body ;
+busDefinition: 'bus' ID ('(' argNames=simpleIdentifierList? ')')? body ;
 
 publicInputsDefinition: '{' 'public' '[' publicInputs=simpleIdentifierList ']' '}' ;
 
