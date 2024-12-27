@@ -195,7 +195,7 @@ signalIdentifier
 
 signalIdentifierList: (signalIdentifier ',')* signalIdentifier ;
 
-identifierStatement: ID idetifierAccess* ;
+identifierStatement: ID identifierAccess* ;
 
 identifier: ID arrayDimension* ;
 
@@ -203,7 +203,7 @@ identifierList: (identifier ',')* identifier ;
 
 simpleIdentifierList: (ID ',')* ID ;
 
-idetifierAccess
+identifierAccess
     : arrayDimension
     | identifierReferance
     ;
